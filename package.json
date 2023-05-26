@@ -1,18 +1,34 @@
 {
   "name": "gpn-tron",
-  "description": "Lets challenge coders and create the perfect tron bot!",
   "version": "0.0.1",
+  "description": "Lets challenge coders and create the perfect tron bot!",
+  "main": "index.js",
   "repository": "https://github.com/freehuntx/gpn-tron.git",
   "author": "FreehuntX",
   "license": "MIT",
   "scripts": {
-    "dev:server": "concurrently \"esbuild server/index.ts --platform=node --watch --bundle --outfile=dist/server/index.js\" \"nodemon --watch dist/server dist/server/index.js\"",
-    "build:server": "esbuild server/index.ts --platform=node --bundle --outfile=dist/server/index.js",
-    "start:server": "npm run build:server && node dist/server",
-    "dev:viewer": "vite",
-    "build:viewer": "vite build",
-    "preview:viewer": "vite preview"
+    "dev:server": "concurrently \"esbuild server/index.ts --platform=node --watch --bundle --outfile=dist/server/index.js\" \"nodemon --watch dist/server dist/server/index.js\""
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "events": "^3.3.0",
+    "express": "^4.18.2",
+    "multi-elo": "^2.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "recharts": "^2.6.2",
+    "socket.io": "^4.6.1",
+    "socket.io-client": "^4.6.1",
+    "ws": "^8.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.2.3",
+    "@types/react": "^18.2.6",
+    "@types/react-dom": "^18.2.4",
+    "@types/ws": "^8.5.4",
+    "concurrently": "^8.0.1",
+    "esbuild": "^0.17.19",
+    "nodemon": "^2.0.22",
+    "typescript": "^5.0.4",
+    "vite": "^4.3.8"
+  }
 }
