@@ -2,13 +2,14 @@
 
 The protocol is string based.  
 Every packet must and will end with a newline (\n).  
-E.g: pos|10|50|5
+E.g: `pos|10|50|5`  
+**Note:** _All examples in this documentation are given without \n. But dont forget it in your parsing!_
 
 ## Packet structure
 
 The general packet structure looks like this:  
-<packet type><...arguments>  
-E.g: game|5|1|2|3  
+\<packet type\>\<...arguments\>  
+E.g: `game|5|1|2|3\n`  
 Where game is the packet type, 5 the first argument, 1 the second, 2 the third and 3 the fourth
 
 ## Packet types
