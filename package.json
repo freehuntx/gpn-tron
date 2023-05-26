@@ -1,0 +1,18 @@
+{
+  "name": "gpn-tron",
+  "description": "Lets challenge coders and create the perfect tron bot!",
+  "version": "0.0.1",
+  "repository": "https://github.com/freehuntx/gpn-tron.git",
+  "author": "FreehuntX",
+  "license": "MIT",
+  "scripts": {
+    "dev:server": "concurrently \"esbuild server/index.ts --platform=node --watch --bundle --outfile=dist/server/index.js\" \"nodemon --watch dist/server dist/server/index.js\"",
+    "build:server": "esbuild server/index.ts --platform=node --bundle --outfile=dist/server/index.js",
+    "start:server": "npm run build:server && node dist/server",
+    "dev:viewer": "vite",
+    "build:viewer": "vite build",
+    "preview:viewer": "vite preview"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
