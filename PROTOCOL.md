@@ -9,7 +9,7 @@ E.g: `pos|10|50|5`
 
 The general packet structure looks like this:  
 \<packet type\>\<...arguments\>  
-E.g: `game|5|1|2|3\n`  
+E.g: `game|5|1|2|3`  
 Where game is the packet type, 5 the first argument, 1 the second, 2 the third and 3 the fourth
 
 ## Packet types
