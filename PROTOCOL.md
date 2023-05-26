@@ -2,8 +2,8 @@
 
 The protocol is string based.  
 Every packet must and will end with a newline (\n).  
-E.g: `pos|10|50|5`  
-**Note:** _All examples in this documentation are given without \n. But dont forget it in your parsing!_
+E.g: `pos|10|50|5\n`  
+**Note:** _All next examples in this documentation are given without \n. But dont forget it in your parsing!_
 
 ## Packet structure
 
