@@ -1,15 +1,10 @@
 {
-  "name": "gpn-tron",
-  "description": "Lets challenge coders and create the perfect tron bot!",
-  "version": "0.0.1",
-  "repository": "https://github.com/freehuntx/gpn-tron.git",
-  "author": "FreehuntX",
-  "license": "MIT",
+  "private": true,
+  "workspaces": ["server", "shared", "viewer"],
   "scripts": {
-    "dev": "tsx src/index.ts"
+    "dev": "yarn workspace @gpn-tron/viewer run dev"
   },
-  "dependencies": {},
-  "devDependencies": {
-    "tsx": "^3.12.7"
+  "stackblitz": {
+    "startCommand": "yarn dev"
   }
 }
