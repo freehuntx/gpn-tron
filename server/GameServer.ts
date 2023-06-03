@@ -63,6 +63,7 @@ export class GameServer {
     // We listen once to the packet event. We expect the first packet to be a join packet
     clientSocket.once('packet', (packetType: string, username: string, password: string) => {
       if (packetType !== 'join') return clientSocket.sendError('ERROR_EXPECTED_JOIN', true)
+      clearTimeout(joinTimeoutTimer) // Timeout is not needed as the client sent the join packet
 
       // Check the username
       if (typeof username !== "string") return clientSocket.sendError('ERROR_INVALID_USERNAME', true)
@@ -92,7 +93,6 @@ export class GameServer {
         }
       }
 
-      clearTimeout(joinTimeout) // Timeout is not needed as the client joined properly
       player.setSocket(clientSocket) // Lets update the socket of this player
     })
   }

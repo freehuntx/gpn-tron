@@ -1,13 +1,11 @@
 {
-    "name": "@gpn-tron/server",
-    "version": "0.0.1",
-    "license": "MIT",
-    "scripts": {
-    },
-    "dependencies": {
-      "@gpn-tron/shared": "*"
-    },
-    "devDependencies": {
-    }
-  }
-  
+  "name": "@gpn-tron/server",
+  "version": "0.0.1",
+  "license": "MIT",
+  "scripts": {},
+  "dependencies": {
+    "@gpn-tron/shared": "*",
+    "multi-elo": "^2.2.0"
+  },
+  "devDependencies": {}
+}
