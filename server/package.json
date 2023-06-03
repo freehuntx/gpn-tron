@@ -5,6 +5,7 @@
     "scripts": {
     },
     "dependencies": {
+      "@gpn-tron/shared": "*"
     },
     "devDependencies": {
     }

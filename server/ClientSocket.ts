@@ -1,6 +1,6 @@
 import { Socket } from 'net'
 import { EventEmitter } from 'events'
-import { afkTimeout, maxPackets } from '@gpn-tron/shared/constants/common'
+import { maxPacketsPerSecond } from '@gpn-tron/shared/constants/common'
 
 export class ClientSocket extends EventEmitter {
   #connected = false
@@ -9,32 +9,41 @@ export class ClientSocket extends EventEmitter {
   #recvBuffer = ''
   #recvPacketCount = 0
 
+  /**
+   * Create a ClientSocket instance from a tcp socket instance
+   * @param socket TCP Socket instance
+   * @returns {ClientSocket | null} Returns a ClientSocket instance or null if there was an error
+   */
+  static fromSocket(socket: Socket) {
+    try {
+      return new ClientSocket(socket)
+    } catch (error) {
+      console.error(error)
+      return null
+    }
+  }
+
   constructor(socket: Socket) {
     super()
+
+    if (socket.destroyed) throw new Error('Socket is not connected')
+    if (!socket.remoteAddress) throw new Error('Socket has no valid ip')
+
     this.#connected = true
     this.#socket = socket
-    // FIXME: Add disconnect if no ip could be get?
-    this.#ip = socket.remoteAddress || ''
-
-    // We expect the user to send atleast every 10 seconds some data. Otherwise he is afk
-    let dataTimeout: any
+    this.#ip = socket.remoteAddress
 
     this.#socket.on('data', chunk => {
       // More than x packets per second can be considered as spam.
-      // Increase packet recv counter by 1 and check if its above 10
-      if (this.#recvPacketCount++ > maxPackets) {
-        return this.sendError(`Dont spam me! Max ${maxPackets} packets per second!`, true)
+      // Increase packet recv counter by 1 and check if its above the max
+      if (this.#recvPacketCount++ > maxPacketsPerSecond) {
+        return this.sendError('ERROR_SPAM', true)
       }
 
-      // After a second reduce the packet counter again
+      // After a second reduce the packet count by one again so this packet is just counted for 1 second
       setTimeout(() => {
         this.#recvPacketCount--
       }, 1000)
-
-      clearTimeout(dataTimeout)
-      dataTimeout = setTimeout(() => {
-        return this.sendError('You are kicked because afk', true)
-      }, afkTimeout)
 
       this.#recvBuffer += chunk.toString()
 
@@ -46,7 +55,7 @@ export class ClientSocket extends EventEmitter {
       }
 
       if (this.#recvBuffer.length > 1024) {
-        this.sendError('Packet buffer overflow', true)
+        this.sendError('ERROR_PACKET_OVERFLOW', true)
       }
     })
 
@@ -71,7 +80,7 @@ export class ClientSocket extends EventEmitter {
   send(type: string, ...args: any) {
     if (!this.connected || !this.#socket || this.#socket.destroyed) return
     try {
-      this.#socket?.write(`${[type, ...args].join('|')}\n`)
+      this.#socket.write(`${[type, ...args].join('|')}\n`)
     }
     catch (error) {
       console.error(error)
