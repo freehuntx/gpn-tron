@@ -5,6 +5,7 @@
     "dev": "yarn workspace @gpn-tron/viewer run dev"
   },
   "stackblitz": {
+    "installDependencies": false,
     "startCommand": "yarn dev"
   }
 }

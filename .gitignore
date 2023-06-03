@@ -1,6 +1,7 @@
 # Ignore yarn or pnpm to keep it npm only
 yarn.lock
 pnpm-lock.yaml
+package-lock.json
 
 # Logs
 logs
