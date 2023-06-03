@@ -1,4 +1,4 @@
-export const tickrate = 3; // 5 ticks a second
-export const afkTimeout = 10 * 1000; // 10 seconds
-export const maxPackets = tickrate * 3;
-export const maxConnections = 5;
+export const afkTimeout = 0
+export const joinTimeout = 5000
+export const maxPacketsPerSecond = 3
+export const maxConnections = 1

@@ -1,0 +1,13 @@
+{
+    "name": "@gpn-tron/server",
+    "version": "0.0.1",
+    "license": "MIT",
+    "scripts": {
+    },
+    "dependencies": {
+      "@gpn-tron/shared": "*"
+    },
+    "devDependencies": {
+    }
+  }
+  

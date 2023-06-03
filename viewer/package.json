@@ -1,0 +1,21 @@
+{
+    "name": "@gpn-tron/viewer",
+    "version": "0.0.1",
+    "license": "MIT",
+    "scripts": {
+      "dev": "next dev"
+    },
+    "dependencies": {
+      "@next/swc-wasm-nodejs": "13.2.3",
+      "next": "13.2.3",
+      "react": "^18.2.0",
+      "react-dom": "^18.2.0",
+      "recharts": "^2.6.2"
+    },
+    "devDependencies": {
+      "@types/node": "^20.2.5",
+      "@types/react": "^18.2.7",
+      "typescript": "^5.0.4"
+    }
+  }
+  
