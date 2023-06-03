@@ -6,6 +6,6 @@
   },
   "stackblitz": {
     "installDependencies": false,
-    "startCommand": "yarn dev"
+    "startCommand": "yarn && yarn dev"
   }
 }
