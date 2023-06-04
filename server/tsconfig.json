@@ -1,5 +1,10 @@
 {
   "compilerOptions": {
-    "types": ["../shared/types"]
-  }
+    "target": "ESNext",
+    "moduleResolution": "node"
+  },
+  "include": [
+    "./**/*.ts",
+    "../shared/types/**/*.d.ts"
+  ]
 }

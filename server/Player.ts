@@ -1,50 +1,26 @@
 import { EventEmitter } from 'events'
 import { ClientSocket } from './ClientSocket'
-import { Game } from './Game'
-
-export enum PlayerAction {
-  NONE,
-  MOVE_UP,
-  MOVE_RIGHT,
-  MOVE_DOWN,
-  MOVE_LEFT
-}
-
-export interface PlayerState {
-  pos: Vec2
-  chat?: string
-}
-
-export type Score = { type: 'win' | 'lose'; time: number }
-export type ScoreHistory = Score[]
 
 export class Player extends EventEmitter {
   #socket?: ClientSocket
-  #username = ''
-  #password = ''
+  #username: string
+  #password: string
   #chatMessage?: string
   #pos = { x: 0, y: 0 }
-  #game?: Game
   #action: PlayerAction = PlayerAction.NONE
-  #state: PlayerState
   #scoreHistory: ScoreHistory = []
   #eloScore = 1000
-
 
   constructor(username: string, password: string) {
     super()
     this.#username = username
     this.#password = password
-    this.#state = {
-      pos: { ...this.#pos }
-    }
   }
 
   get username(): string { return this.#username }
   get password(): string { return this.#password }
   get pos(): { x: number; y: number } { return this.#pos }
   get connected(): boolean { return !!this.#socket?.connected }
-  get state(): PlayerState { return this.#state }
   get eloScore(): number { return this.#eloScore }
   set eloScore(eloScore: number) { this.#eloScore = eloScore }
 
@@ -58,11 +34,10 @@ export class Player extends EventEmitter {
     this.#scoreHistory = newHistory
   }
   get wins(): number {
-    return this.scoreHistory.filter(({ type }) => type === 'win').length
+    return this.scoreHistory.filter(({ type }) => type === ScoreType.WIN).length
   }
   get loses(): number {
-    const now = Date.now()
-    return this.scoreHistory.filter(({ type }) => type === 'lose').length
+    return this.scoreHistory.filter(({ type }) => type === ScoreType.LOOSE).length
   }
   get winRatio(): number {
     const games = this.wins + this.loses
@@ -83,27 +58,9 @@ export class Player extends EventEmitter {
     this.#socket.on('disconnected', this.#onDisconnect.bind(this))
   }
 
-  joinGame(game: Game) {
-    if (this.#game) this.leaveGame()
-    this.#game = game
-    
-    this.send('goal', game.maze.goal.x, game.maze.goal.y) // Deprecated
-    this.send('game', game.maze.width, game.maze.height, game.maze.goal.x, game.maze.goal.y)
-
-    this.#game.addPlayer(this)
-    
-  }
-
-  leaveGame() {
-    this.#game?.removePlayer(this)
-    this.#game = undefined
-  }
-
   setPos(x: number, y: number) {
     this.#pos.x = x
     this.#pos.y = y
-    this.#state.pos.x = x
-    this.#state.pos.y = y
   }
 
   disconnect() {
@@ -114,13 +71,17 @@ export class Player extends EventEmitter {
     this.#socket?.send(type, ...args)
   }
 
+  rawSend(packet: string) {
+    this.#socket?.rawSend(packet)
+  }
+
   win() {
-    this.#scoreHistory.push({ type: 'win', time: Date.now() })
+    this.#scoreHistory.push({ type: ScoreType.WIN, time: Date.now() })
     this.#socket?.send('win', this.wins, this.loses)
   }
 
   lose() {
-    this.#scoreHistory.push({ type: 'lose', time: Date.now() })
+    this.#scoreHistory.push({ type: ScoreType.LOOSE, time: Date.now() })
     this.#socket?.send('lose', this.wins, this.loses)
   }
 
@@ -135,7 +96,7 @@ export class Player extends EventEmitter {
       else if (direction === 'right') this.#action = PlayerAction.MOVE_RIGHT
       else if (direction === 'down') this.#action = PlayerAction.MOVE_DOWN
       else if (direction === 'left') this.#action = PlayerAction.MOVE_LEFT
-      else this.sendError('unknown move direction')
+      else this.sendError('WARNING_UNKNOWN_MOVE')
     }
     else if (packetType === 'chat') {
       if (this.#chatMessage !== undefined) {
@@ -148,12 +109,10 @@ export class Player extends EventEmitter {
           this.sendError('invalid chat message')
         } else {
           this.#chatMessage = chatMessage
-          this.#state.chat = chatMessage
 
           // Clear the chat message in 5 seconds
           setTimeout(() => {
             this.#chatMessage = undefined
-            delete this.#state.chat
           }, 5000)
         }
       }
@@ -163,7 +122,6 @@ export class Player extends EventEmitter {
   }
 
   #onDisconnect() {
-    if (this.#game) this.leaveGame()
     this.#socket = undefined
     this.#chatMessage = undefined
     this.#action = PlayerAction.NONE

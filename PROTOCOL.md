@@ -89,16 +89,17 @@ The pos packet is sent by the server to inform the client about a players curren
 
 ### die
 
-The die packet is sent by the server to inform the client about a player who died.
+The die packet is sent by the server to inform the client about a players who died.
 
 **Name:** die  
 **Sender:** Server  
 **Arguments:**  
 | # | Type | Description |
 |---|--------|--------------------------------------------------------------------|
-| 1 | Number | The player id |
+| 1... | Number | The player id |
 
-**Example:** `die|5`
+**Example (1 dead player):** `die|5`  
+**Example (4 dead player):** `die|5|8|9|13`
 
 ### move
 
@@ -123,6 +124,20 @@ The chat packet is sent by the client to send a cool chat message :>.
 | # | Type | Description |
 |---|--------|-----------------------------|
 | 1 | String | The chat message to display |
+
+**Example:** `chat|I am so cool`
+
+### message
+
+The message packet is sent by the server to inform about a chat message of another player
+
+**Name:** message  
+**Sender:** Server  
+**Arguments:**  
+| # | Type | Description |
+|---|--------|-----------------------------|
+| 1 | Number | The player id |
+| 2 | String | The chat message to display |
 
 **Example:** `chat|I am so cool`
 

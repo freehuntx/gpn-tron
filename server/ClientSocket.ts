@@ -78,9 +78,13 @@ export class ClientSocket extends EventEmitter {
   }
 
   send(type: string, ...args: any) {
+    return this.rawSend(`${[type, ...args].join('|')}\n`)
+  }
+
+  rawSend(packet: string) {
     if (!this.connected || !this.#socket || this.#socket.destroyed) return
     try {
-      this.#socket.write(`${[type, ...args].join('|')}\n`)
+      this.#socket.write(packet)
     }
     catch (error) {
       console.error(error)
