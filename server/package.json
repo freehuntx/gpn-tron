@@ -2,10 +2,14 @@
   "name": "@gpn-tron/server",
   "version": "0.0.1",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "dev": "tsx watch index.ts"
+  },
   "dependencies": {
     "@gpn-tron/shared": "*",
     "multi-elo": "^2.2.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "tsx": "^3.12.7"
+  }
 }

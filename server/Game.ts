@@ -1,23 +1,30 @@
 import { EventEmitter } from 'events'
 import { MultiElo } from 'multi-elo'
 import { tickrate } from '@gpn-tron/shared/constants/common'
-import { Player } from "./Player"
+import { Player, PlayerAction } from "./Player"
 
-export interface GameState {
-  id: string
-  width: number
-  height: number
-  start: Vec2
-  goal: Vec2
+export enum ScoreType {
+  LOOSE,
+  WIN
 }
 
+export type Score = {
+  type: ScoreType
+  time: number
+}
+
+export type ScoreHistory = Score[]
+
+
 export class Game extends EventEmitter {
+  #id: string
   #players: Player[]
   #alivePlayerIds: number[]
   #deadPlayerIds: number[]
   #width: number
   #height: number
   #fields: Array<Array<number>>
+  #state: GameState
 
   get alivePlayers(): Player[] {
     return this.#alivePlayerIds.map(e => this.#players[e])
@@ -25,20 +32,41 @@ export class Game extends EventEmitter {
   get deadPlayers(): Player[] {
     return this.#deadPlayerIds.map(e => this.#players[e])
   }
+  get state() {
+    return this.#state
+  }
 
   constructor(players: Player[]) {
     super()
 
+    this.#id = Math.random().toString(32).slice(2)
     this.#players = players
     this.#alivePlayerIds = players.map((e, i) => i)
+    this.#deadPlayerIds = []
     this.#width = players.length * 3
     this.#height = players.length * 3
 
     this.#initializeFields()
     this.#initializeGame()
+    this.#initializeState()
 
     const tickInterval = setInterval(() => this.#onTick(), 1000 / tickrate)
     this.on('end', () => clearInterval(tickInterval))
+  }
+
+  #initializeState() {
+    const players = {}
+    for (const player of this.#players) {
+      players[player.username] = player.state
+    }
+
+    this.#state = {
+      id: this.#id,
+      width: this.#width,
+      height: this.#height,
+      players,
+      fields: this.#fields
+    }
   }
 
   #initializeFields() {
@@ -152,7 +180,7 @@ export class Game extends EventEmitter {
     }
 
     // Check for game end
-    if (this.#alivePlayerIds.length <= 1) {
+    if (this.#alivePlayerIds.length < 1) {
       const winners: Player[] = []
       if (this.#alivePlayerIds.length === 1) {
         const winner = this.#players[this.#alivePlayerIds[0]]
@@ -163,7 +191,7 @@ export class Game extends EventEmitter {
       const losers = this.#deadPlayerIds.map(e => this.#players[e])
 
       // Update ELO scores
-      if (winners.length) {
+      if (winners.length && losers.length) {
         const playersInOrder = [...winners, ...losers];
         const placesInOrder = [...(winners.map(player => 1)), ...(losers.map(player => 2))];
         const newEloScores = MultiElo.getNewRatings(playersInOrder.map(player => player.eloScore), placesInOrder);

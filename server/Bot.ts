@@ -67,14 +67,12 @@ export class Bot {
 
     const args = packet.split('|').map(arg => /^\-?\d+(\.\d+)?$/.test(arg) ? Number(arg) : arg)
     const type = args.shift()
-    const debug = true
+    //console.log(type, ...args)
 
     // Do
     if (type === 'motd') {
-      if (debug) console.log('motd', ...args)
     }
     else if (type === 'error') {
-      if (debug) console.log('error', ...args)
     }
     else if (type === 'game') {
       const [width, height, playerId] = args as number[]

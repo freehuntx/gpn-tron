@@ -1,5 +1,14 @@
 import { EventEmitter } from 'events'
 import { ClientSocket } from './ClientSocket'
+import { ScoreHistory, ScoreType } from './Game'
+
+export enum PlayerAction {
+  NONE,
+  MOVE_UP,
+  MOVE_RIGHT,
+  MOVE_DOWN,
+  MOVE_LEFT
+}
 
 export class Player extends EventEmitter {
   #socket?: ClientSocket
@@ -10,11 +19,14 @@ export class Player extends EventEmitter {
   #action: PlayerAction = PlayerAction.NONE
   #scoreHistory: ScoreHistory = []
   #eloScore = 1000
+  #state: PlayerState
 
   constructor(username: string, password: string) {
     super()
     this.#username = username
     this.#password = password
+
+    this.#initializeState()
   }
 
   get username(): string { return this.#username }
@@ -23,6 +35,7 @@ export class Player extends EventEmitter {
   get connected(): boolean { return !!this.#socket?.connected }
   get eloScore(): number { return this.#eloScore }
   set eloScore(eloScore: number) { this.#eloScore = eloScore }
+  get state() { return this.#state }
 
   // Returns the time filtered scores. Everything above 2 hours is removed.
   get scoreHistory(): ScoreHistory {
@@ -44,6 +57,12 @@ export class Player extends EventEmitter {
     return games > 0 ? this.wins / games : 0
   }
 
+  #initializeState() {
+    this.#state = {
+      pos: this.#pos
+    }
+  }
+
   readAndResetAction(): PlayerAction {
     const action = this.#action
     this.#action = PlayerAction.NONE
@@ -61,6 +80,8 @@ export class Player extends EventEmitter {
   setPos(x: number, y: number) {
     this.#pos.x = x
     this.#pos.y = y
+    this.#state.pos.x = x
+    this.#state.pos.y = y
   }
 
   disconnect() {
@@ -109,10 +130,12 @@ export class Player extends EventEmitter {
           this.sendError('invalid chat message')
         } else {
           this.#chatMessage = chatMessage
+          this.#state.chat = chatMessage
 
           // Clear the chat message in 5 seconds
           setTimeout(() => {
             this.#chatMessage = undefined
+            this.#state.chat = undefined
           }, 5000)
         }
       }

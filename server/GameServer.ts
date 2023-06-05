@@ -2,10 +2,12 @@ import { networkInterfaces, tmpdir } from 'os'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { createServer, Server, Socket } from 'net'
 import { joinTimeout, maxConnections } from '@gpn-tron/shared/constants/common'
+import { WsStateServer } from '@gpn-tron/shared/lib/ws-state/server'
 import { ClientSocket } from './ClientSocket'
 import { Player } from './Player'
-import { Game } from './Game'
+import { Game, ScoreType } from './Game'
 
+const VIEW_PORT = parseInt(process.env.VIEW_PORT || '') || 4001
 const GAME_DATA_PATH = `${tmpdir()}/gpn-tron-data.json`
 const HOSTNAMES = Object.values(networkInterfaces())
   .map(e => e || [])
@@ -19,6 +21,7 @@ if (HOSTNAMES.length === 0) throw new Error('Failed getting external ips!')
 export class GameServer {
   #port: number // Port number of the game tcp server
   #tcpServer: Server // TCP Server instance
+  #viewServer: WsStateServer<ViewState> // View server instance
   #connectionIpMap: Record<string, number> = {} // Used to count the amount of connections per ip
   #players: Record<string, Player> = {} // Map of players. Key=username, Value=player
   #game?: Game // Game instance (if a game is active)
@@ -27,12 +30,28 @@ export class GameServer {
     this.#port = port
     this.#tcpServer = createServer(this.#onSocket.bind(this))
 
+    this.#initViewServer()
     this.#loadGameData()
     this.#updateScoreboard()
 
     setTimeout(() => {
-      this.#tcpServer.listen(this.#port)
+      this.#tcpServer.listen(this.#port, '0.0.0.0')
+      console.log('Game server started on port:', this.#port)
     }, 1)
+
+    setTimeout(() => this.#startGame(), 1000)
+  }
+
+  #initViewServer() {
+    this.#viewServer = new WsStateServer<ViewState>(VIEW_PORT, {
+      serverInfoList: HOSTNAMES.map(host => ({
+        host,
+        port: this.#port
+      })),
+      chartData: [],
+      scoreboard: [],
+      lastWinners: []
+    })
   }
 
   /**
@@ -89,10 +108,8 @@ export class GameServer {
       })
       .slice(0, 10)
 
-    // TODO: Share scorebaord players with viewer somehow
-
-    //this.#viewServer.state.scoreboard = scoreboardPlayers
-    //  .map(({ username, winRatio, wins, loses, eloScore }) => ({ username, winRatio, wins, loses, elo: eloScore }))
+    this.#viewServer.state.scoreboard = scoreboardPlayers
+      .map(({ username, winRatio, wins, loses, eloScore }) => ({ username, winRatio, wins, loses, elo: eloScore }))
 
     this.#updateChartData(scoreboardPlayers)
   }
@@ -117,8 +134,7 @@ export class GameServer {
       return chartPoint
     })
 
-    // TODO: Share chart data with viewer somehow
-    //this.#viewServer.state.chartData = chartData
+    this.#viewServer.state.chartData = chartData
   }
 
   /**
@@ -130,15 +146,20 @@ export class GameServer {
     if (this.#game) throw new Error('Game in progress')
 
     const connectedPlayers = Object.values(this.#players).filter(player => player.connected)
+    if (!connectedPlayers.length) {
+      setTimeout(() => this.#startGame(), 1000)
+      return
+    }
 
     this.#game = new Game(connectedPlayers) // Create a new game
+    this.#viewServer.state.game = this.#game.state
 
     // Lets listen to the game end event
     this.#game.on('end', (winners: Player[]) => {
       this.#game.removeAllListeners()
       this.#game = undefined
 
-      //this.#viewServer.state.lastWinners = winners.map(({ username }) => username)
+      this.#viewServer.state.lastWinners = winners.map(({ username }) => username)
 
       // Store the current game data
       this.#storeGameData()

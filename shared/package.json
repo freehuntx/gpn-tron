@@ -2,11 +2,11 @@
     "name": "@gpn-tron/shared",
     "version": "0.0.1",
     "license": "MIT",
-    "scripts": {
-    },
+    "scripts": {},
     "dependencies": {
+        "fast-json-patch": "^3.1.1",
+        "socket.io": "^4.6.2",
+        "socket.io-client": "^4.6.2"
     },
-    "devDependencies": {
-    }
-  }
-  
+    "devDependencies": {}
+}
