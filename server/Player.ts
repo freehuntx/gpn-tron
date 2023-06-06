@@ -131,6 +131,8 @@ export class Player extends EventEmitter {
         } else {
           this.#chatMessage = chatMessage
           this.#state.chat = chatMessage
+          
+          this.emit('chat', chatMessage)
 
           // Clear the chat message in 5 seconds
           setTimeout(() => {

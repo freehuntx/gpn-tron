@@ -54,6 +54,12 @@ export class Game extends EventEmitter {
     this.on('end', () => clearInterval(tickInterval))
   }
 
+  broadcast(type: string, ...args: any) {
+    this.#players.forEach(player => {
+      player.send(type, ...args)
+    })
+  }
+
   #initializeState() {
     const players = {}
     for (const player of this.#players) {
@@ -83,6 +89,16 @@ export class Game extends EventEmitter {
     for (const playerIndex of this.#alivePlayerIds) {
       const player = this.#players[playerIndex]
       player.send('game', this.#width, this.#height, playerIndex)
+
+      // Watch for chat messages and share them with all players
+      const onChat = message => {
+        this.#game.broadcast('message', playerIndex, message)
+      }
+      player.on('chat', onChat)
+
+      this.once('end', () => {
+        player.off('chat', onChat)
+      })
     }
   }
 
