@@ -59,6 +59,8 @@ export class Player extends EventEmitter {
 
   #initializeState() {
     this.#state = {
+      alive: false,
+      name: this.#username,
       pos: this.#pos
     }
   }
@@ -75,6 +77,11 @@ export class Player extends EventEmitter {
     this.#socket = socket
     this.#socket.on('packet', this.#onPacket.bind(this))
     this.#socket.on('disconnected', this.#onDisconnect.bind(this))
+  }
+
+  spawn(x: number, y: number) {
+    this.setPos(x, y)
+    this.#state.alive = true
   }
 
   setPos(x: number, y: number) {
@@ -104,6 +111,7 @@ export class Player extends EventEmitter {
   lose() {
     this.#scoreHistory.push({ type: ScoreType.LOOSE, time: Date.now() })
     this.#socket?.send('lose', this.wins, this.loses)
+    this.#state.alive = false
   }
 
   sendError(error: string, disconnect = false) {
@@ -131,7 +139,7 @@ export class Player extends EventEmitter {
         } else {
           this.#chatMessage = chatMessage
           this.#state.chat = chatMessage
-          
+
           this.emit('chat', chatMessage)
 
           // Clear the chat message in 5 seconds

@@ -5,13 +5,15 @@ export class Bot {
   #ip: string
   #port: number
   #connected = false
+  #name: string
   #ingame = false
   #playerId: number
   #width: number
   #height: number
   #fields: Array<Array<number>>
 
-  constructor(ip: string, port: number) {
+  constructor(name: string, ip: string, port: number) {
+    this.#name = name
     this.#ip = ip
     this.#port = port
 
@@ -39,9 +41,11 @@ export class Bot {
       setTimeout(() => this.connect(), 1000)
     })
 
+    this.#socket.on('error', console.error)
+
     this.#socket.connect(this.#port, this.#ip, () => {
       this.#connected = true
-      this.send('join', 'bot', 'password')
+      this.send('join', this.#name, 'password')
     })
   }
 
@@ -81,6 +85,7 @@ export class Bot {
       this.#width = width
       this.#height = height
       this.#fields = Array(width).fill(null).map(() => Array(height).fill(-1))
+      this.send('chat', 'Huehuehue')
     }
     else if (type === 'die') {
       for (let x = 0; x < this.#width; x++) {
@@ -102,30 +107,35 @@ export class Bot {
 
       // If its us, try to find a free field to move to
       if (playerId === this.#playerId) {
+        const possibleMoves: Record<string, boolean> = {}
+
         if (y === 0 && this.#fields[x][this.#height - 1] === -1) {
-          this.send('move', 'up')
+          possibleMoves.up = true
         }
-        else if (this.#fields[x][y - 1] === -1) {
-          this.send('move', 'up')
+        if (y > 0 && this.#fields[x][y - 1] === -1) {
+          possibleMoves.up = true
         }
-        else if (x === this.#width - 1 && this.#fields[0][y] === -1) {
-          this.send('move', 'right')
+        if (x === this.#width - 1 && this.#fields[0][y] === -1) {
+          possibleMoves.right = true
         }
-        else if (this.#fields[x + 1][y] === -1) {
-          this.send('move', 'right')
+        if (x < this.#width - 1 && this.#fields[x + 1][y] === -1) {
+          possibleMoves.right = true
         }
-        else if (y === this.#height - 1 && this.#fields[x][0] === -1) {
-          this.send('move', 'down')
+        if (y === this.#height - 1 && this.#fields[x][0] === -1) {
+          possibleMoves.down = true
         }
-        else if (this.#fields[x][y + 1] === -1) {
-          this.send('move', 'down')
+        if (y < this.#height - 1 && this.#fields[x][y + 1] === -1) {
+          possibleMoves.down = true
         }
-        else if (x === 0 && this.#fields[this.#width - 1][y] === -1) {
-          this.send('move', 'left')
+        if (x === 0 && this.#fields[this.#width - 1][y] === -1) {
+          possibleMoves.left = true
         }
-        else if (this.#fields[x - 1][y] === -1) {
-          this.send('move', 'left')
+        if (x > 0 && this.#fields[x - 1][y] === -1) {
+          possibleMoves.left = true
         }
+
+        const possibleArr = Object.keys(possibleMoves)
+        if (possibleArr.length) this.send('move', possibleArr[Math.floor(Math.random() * possibleArr.length)])
       }
     }
   }

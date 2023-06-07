@@ -1,18 +1,19 @@
+type ServerInfoList = { host: string; port: number }[]
+type ScoreboardEntry = { username: string; winRatio: number; wins: number; loses: number, elo: number }
+type ChartData = Record<string, any>[]
+
 interface ViewState {
-  serverInfoList: {
-    host: string
-    port: number
-  }[],
+  serverInfoList: ServerInfoList
   game?: GameState
-  chartData: any[]
-  scoreboard: any[]
-  lastWinners: any[]
+  chartData: ChartData
+  scoreboard: ScoreboardEntry[]
+  lastWinners: string[]
 }
 
 interface GameState {
   id: string
   width: number
   height: number
-  players: Record<string, PlayerState>
+  players: PlayerState[]
   fields: Array<Array<number>>
 }

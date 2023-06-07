@@ -8,7 +8,9 @@ async function main() {
 
   // Spawn a bot
   setTimeout(() => {
-    const bot = new Bot('127.0.0.1', GAME_PORT)
+    for (let i = 0; i < 10; i++) {
+      const bot = new Bot('bot' + i, '127.0.0.1', GAME_PORT)
+    }
   }, 1000)
 }
 

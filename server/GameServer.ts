@@ -35,7 +35,7 @@ export class GameServer {
     this.#updateScoreboard()
 
     setTimeout(() => {
-      this.#tcpServer.listen(this.#port, '0.0.0.0')
+      this.#tcpServer.listen(this.#port)
       console.log('Game server started on port:', this.#port)
     }, 1)
 
@@ -155,7 +155,7 @@ export class GameServer {
     this.#viewServer.state.game = this.#game.state
 
     // Lets listen to the game end event
-    this.#game.on('end', (winners: Player[]) => {
+    this.#game.once('end', (winners: Player[]) => {
       this.#game.removeAllListeners()
       this.#game = undefined
 
@@ -186,7 +186,7 @@ export class GameServer {
       this.#connectionIpMap[clientSocket.ip]--
     })
 
-    if (maxConnections >= 0 && this.#connectionIpMap[clientSocket.ip] > maxConnections) {
+    if (maxConnections >= 0 && this.#connectionIpMap[clientSocket.ip] > maxConnections && !clientSocket.ip.endsWith('127.0.0.1')) {
       return clientSocket.sendError('ERROR_MAX_CONNECTIONS', true)
     }
 
@@ -216,7 +216,7 @@ export class GameServer {
 
       // Check for bots
       if (username === 'bot') {
-        if (clientSocket.ip !== '127.0.0.1') {
+        if (!clientSocket.ip.endsWith('127.0.0.1')) {
           return clientSocket.sendError('ERROR_NO_PERMISSION', true)
         }
       }

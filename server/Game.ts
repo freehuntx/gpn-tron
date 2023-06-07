@@ -51,7 +51,7 @@ export class Game extends EventEmitter {
     this.#initializeState()
 
     const tickInterval = setInterval(() => this.#onTick(), 1000 / tickrate)
-    this.on('end', () => clearInterval(tickInterval))
+    this.once('end', () => clearInterval(tickInterval))
   }
 
   broadcast(type: string, ...args: any) {
@@ -61,16 +61,11 @@ export class Game extends EventEmitter {
   }
 
   #initializeState() {
-    const players = {}
-    for (const player of this.#players) {
-      players[player.username] = player.state
-    }
-
     this.#state = {
       id: this.#id,
       width: this.#width,
       height: this.#height,
-      players,
+      players: this.#players.map(({ state }) => state),
       fields: this.#fields
     }
   }
@@ -81,24 +76,43 @@ export class Game extends EventEmitter {
     for (let i = 0; i < this.#players.length; i++) {
       const x = i * 3 + 1
       this.#fields[x][y] = i // Set the current player id to the spawn field
-      this.#players[i].setPos(x, y)
+      this.#players[i].spawn(x, y)
     }
   }
 
   #initializeGame() {
+    const onEndRemover = []
+    this.once('end', () => {
+      onEndRemover.forEach(fn => fn())
+    })
+
     for (const playerIndex of this.#alivePlayerIds) {
       const player = this.#players[playerIndex]
       player.send('game', this.#width, this.#height, playerIndex)
 
       // Watch for chat messages and share them with all players
       const onChat = message => {
-        this.#game.broadcast('message', playerIndex, message)
+        this.broadcast('message', playerIndex, message)
       }
       player.on('chat', onChat)
 
-      this.once('end', () => {
+      onEndRemover.push(() => {
         player.off('chat', onChat)
       })
+    }
+
+    this.#broadcastPos()
+  }
+
+  #broadcastPos() {
+    let updatePacket = ''
+    for (const playerIndex of this.#alivePlayerIds) {
+      const { x, y } = this.#players[playerIndex].pos
+      updatePacket += `pos|${playerIndex}|${x}|${y}\n`
+    }
+
+    for (const playerIndex of this.#alivePlayerIds) {
+      this.#players[playerIndex].rawSend(updatePacket)
     }
   }
 
@@ -196,7 +210,11 @@ export class Game extends EventEmitter {
     }
 
     // Check for game end
-    if (this.#alivePlayerIds.length < 1) {
+    let shouldEnd = false
+    if (this.#players.length === 1 && !this.#alivePlayerIds.length) shouldEnd = true
+    else if (this.#players.length > 1 && this.#alivePlayerIds.length <= 1) shouldEnd = true
+
+    if (shouldEnd) {
       const winners: Player[] = []
       if (this.#alivePlayerIds.length === 1) {
         const winner = this.#players[this.#alivePlayerIds[0]]
