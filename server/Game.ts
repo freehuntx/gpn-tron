@@ -118,6 +118,13 @@ export class Game extends EventEmitter {
     // Update player position
     for (const playerIndex of this.#alivePlayerIds) {
       const player = this.#players[playerIndex]
+
+      // Detect disconnected players
+      if (!player.connected) {
+        this.#deadPlayerIds.push(playerIndex)
+        continue
+      }
+
       let action = player.readAndResetAction()
 
       // FIXME: Find a better solutions for players who did no move. Kick them?
@@ -150,6 +157,8 @@ export class Game extends EventEmitter {
     // Apply move to fields
     for (const playerIndex of this.#alivePlayerIds) {
       const player = this.#players[playerIndex]
+      if (!player.connected) continue
+
       const { x, y } = player.pos
       const fieldPlayerIndex = this.#fields[x][y]
       const fieldPlayer = this.#players[fieldPlayerIndex]
