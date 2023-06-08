@@ -90,6 +90,9 @@ export default function Home() {
               </>
             )}
             <Scoreboard />
+            <h2>
+              Wanna share your bot code? Upload to Github with #gpn-tron
+            </h2>
           </div>
         </div>
         <div style={{ flexGrow: 1, width: '100%' }}>
