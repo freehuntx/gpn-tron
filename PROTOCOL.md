@@ -161,7 +161,7 @@ The win packet is sent by the server to inform the client they won.
 | # | Type | Description |
 |---|--------|-----------------|
 | 1 | Number | amount of wins |
-| 2 | Number | amount of loses |
+| 2 | Number | amount of losses |
 
 **Example:** `win|1|20`
 
@@ -175,6 +175,6 @@ The lose packet is sent by the server to inform the client they lost.
 | # | Type | Description |
 |---|--------|-----------------|
 | 1 | Number | amount of wins |
-| 2 | Number | amount of loses |
+| 2 | Number | amount of losses |
 
 **Example:** `lose|1|20`
