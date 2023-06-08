@@ -14,7 +14,7 @@ export function Scoreboard() {
 
   const lines: Record<string, any> = {};
   chartData.forEach((point) => {
-    Object.keys(point).forEach((key, index) => {
+    Object.keys(point).sort().forEach((key, index) => {
       if (key === "name") return;
       lines[key] = {
         key,
