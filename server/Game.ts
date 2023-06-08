@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events'
 import { MultiElo } from 'multi-elo'
-import { tickrate } from '@gpn-tron/shared/constants/common'
+import { baseTickrate, tickIncreaseInterval } from '@gpn-tron/shared/constants/common'
 import { Player, PlayerAction } from "./Player"
 
 export enum ScoreType {
@@ -24,6 +24,8 @@ export class Game extends EventEmitter {
   #height: number
   #fields: Array<Array<number>>
   #state: GameState
+  #tickRate = baseTickrate
+  #startTime = Date.now()
 
   get alivePlayers(): Player[] {
     return this.#alivePlayerIds.map(e => this.#players[e])
@@ -49,7 +51,7 @@ export class Game extends EventEmitter {
     this.#initializeGame()
     this.#initializeState()
 
-    setTimeout(() => this.#onTick(), 1000 / tickrate)
+    setTimeout(() => this.#onTick(), 1000 / baseTickrate)
   }
 
   broadcast(type: string, ...args: any) {
@@ -246,7 +248,12 @@ export class Game extends EventEmitter {
       this.emit('end', winners)
     } else {
       this.broadcast('tick')
-      setTimeout(() => this.#onTick(), 1000 / tickrate)
+
+      // Dynamically define tickrate
+      const timeDiff = Date.now() - this.#startTime
+      this.#tickRate = baseTickrate + Math.floor(timeDiff / 1000 / tickIncreaseInterval)
+
+      setTimeout(() => this.#onTick(), 1000 / this.#tickRate)
     }
   }
 }

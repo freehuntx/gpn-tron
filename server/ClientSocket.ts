@@ -1,13 +1,13 @@
 import { Socket } from 'net'
 import { EventEmitter } from 'events'
-import { maxPacketsPerSecond } from '@gpn-tron/shared/constants/common'
+//import { maxPacketsPerSecond } from '@gpn-tron/shared/constants/common'
 
 export class ClientSocket extends EventEmitter {
   #connected = false
   #ip: string
   #socket?: Socket
   #recvBuffer = ''
-  #recvPacketCount = 0
+  //#recvPacketCount = 0
 
   /**
    * Create a ClientSocket instance from a tcp socket instance
@@ -36,14 +36,14 @@ export class ClientSocket extends EventEmitter {
     this.#socket.on('data', chunk => {
       // More than x packets per second can be considered as spam.
       // Increase packet recv counter by 1 and check if its above the max
-      if (this.#recvPacketCount++ > maxPacketsPerSecond) {
-        return this.sendError('ERROR_SPAM', true)
-      }
+      //if (this.#recvPacketCount++ > maxPacketsPerSecond) {
+      //  return this.sendError('ERROR_SPAM', true)
+      //}
 
       // After a second reduce the packet count by one again so this packet is just counted for 1 second
-      setTimeout(() => {
-        this.#recvPacketCount--
-      }, 1000)
+      //setTimeout(() => {
+      //  this.#recvPacketCount--
+      //}, 1000)
 
       this.#recvBuffer += chunk.toString()
 
