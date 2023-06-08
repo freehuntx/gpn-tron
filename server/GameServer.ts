@@ -212,7 +212,7 @@ export class GameServer {
       if (username.length > 128) return clientSocket.sendError('ERROR_PASSWORD_TOO_LONG', true)
 
       // Check for bots
-      if (username === 'bot') {
+      if (/^bot\d*$/.test(username)) {
         if (!clientSocket.ip.endsWith('127.0.0.1')) {
           return clientSocket.sendError('ERROR_NO_PERMISSION', true)
         }
