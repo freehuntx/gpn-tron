@@ -17,7 +17,8 @@ export class WsStateClient<WsStateType> extends EventEmitter {
     })
 
     this.#socket.on('patch', patch => {
-      this.#state = applyPatch(this.#state, patch).newDocument
+      // Ensure to not keep references
+      this.#state = structuredClone(applyPatch(this.#state, patch).newDocument)
       this.emit('update')
     })
   }
