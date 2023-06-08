@@ -144,8 +144,13 @@ export function Game() {
 
       // Render player path and head
       for (let i = 0; i < game.players.length; i++) {
-        const { alive, pos: { x, y }, moves } = game.players[i]
+        let { alive, pos: { x, y }, moves } = game.players[i]
         if (!alive) continue
+
+        x *= factoredRoomSize
+        y *= factoredRoomSize
+        x += factoredHalfRoomSize
+        y += factoredHalfRoomSize
 
         const playerColor = getColor(i)
         // Render paths
@@ -190,14 +195,12 @@ export function Game() {
         offScreenContext.fill()
       }
 
-      // Render name and chat
+      // Render names
       for (let i = 0; i < game.players.length; i++) {
-        let { alive, name, pos: { x, y }, moves, chat } = game.players[i]
+        let { alive, name, pos: { x, y } } = game.players[i]
         if (!alive) continue
 
         const playerColor = getColor(i)
-        x -= view.x
-        y - view.y
         x *= factoredRoomSize
         y *= factoredRoomSize
         x += factoredHalfRoomSize
@@ -224,13 +227,21 @@ export function Game() {
         offScreenContext.textBaseline = 'top'
         offScreenContext.fillStyle = 'black'
         offScreenContext.fillText(name, nameX + 5, nameY + 5)
+      }
 
-        if (chat) {
-          offScreenContext.fillStyle = 'white'
-          offScreenContext.fillRect(x - 10, y + factoredRoomSize - 20, offScreenContext.measureText(chat).width + 20, 40)
-          offScreenContext.fillStyle = 'black'
-          offScreenContext.fillText(chat, x, y + factoredRoomSize)
-        }
+      // Render chat
+      for (const player of game.players) {
+        let { alive, pos: { x, y }, moves, chat } = player
+        if (!alive || !chat) continue
+
+        x *= factoredRoomSize
+        y *= factoredRoomSize
+        x += factoredHalfRoomSize
+        y += factoredHalfRoomSize
+        offScreenContext.fillStyle = 'white'
+        offScreenContext.fillRect(x - 10, y + factoredRoomSize - 20, offScreenContext.measureText(chat).width + 20, 40)
+        offScreenContext.fillStyle = 'black'
+        offScreenContext.fillText(chat, x, y + factoredRoomSize)
       }
 
       // Now push the rendering to real canvas

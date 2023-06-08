@@ -87,7 +87,7 @@ export class Bot {
       this.#width = width
       this.#height = height
       this.#fields = Array(width).fill(null).map(() => Array(height).fill(-1))
-      //this.send('chat', 'Huehuehue')
+      this.send('chat', 'Im a stupid bot :(')
     }
     else if (type === 'die') {
       for (let x = 0; x < this.#width; x++) {
