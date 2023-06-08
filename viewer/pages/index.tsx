@@ -68,10 +68,16 @@ export default function Home() {
       <div style={{ display: 'flex', height: '100%', width: '100%' }}>
         <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, width: '100%' }}>
           <div style={{ flexGrow: 1, height: '100%' }}>
-            <h3>Serverinfo: (Please prefer IPv6! As IPv4 may change)</h3>
+            <h3>Ports:</h3>
+            <ul>
+              <li>- 3000 [HTTP] (View server)</li>
+              <li>- {serverInfoList[0]?.port || 4000} [TCP] (Game server)</li>
+            </ul>
+            <h3>Hostnames:</h3>
+            <h5>(Please prefer IPv6! As IPv4 may change)</h5>
             <ul>
               {serverInfoList.map(({ host, port }) => (
-                <li key={`${host}:${port}`}>TCP: {`${host}:${port}`}</li>
+                <li key={host}>- {host}</li>
               ))}
             </ul>
           </div>

@@ -2,6 +2,8 @@ import { createServer, Server } from 'http'
 import { Server as IoServer } from 'socket.io'
 import { generate, observe } from 'fast-json-patch'
 
+const EXTERNAL_REACHABLE = true
+
 export class WsStateServer<WsStateType> {
   #server: Server
   #io: IoServer
@@ -24,7 +26,7 @@ export class WsStateServer<WsStateType> {
     }, updateInterval)
 
     setTimeout(() => {
-      this.#server.listen(port, '127.0.0.1')
+      this.#server.listen(port, EXTERNAL_REACHABLE ? undefined : '127.0.0.1')
       console.log('View server started on port:', port)
     }, 1)
   }
