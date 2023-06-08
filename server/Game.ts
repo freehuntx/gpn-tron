@@ -195,8 +195,9 @@ export class Game extends EventEmitter {
     // Remove dead players from alive players array
     const newDeadPlayers: number[] = []
     for (let i = this.#alivePlayerIds.length - 1; i >= 0; i--) {
-      if (this.#deadPlayerIds.indexOf(i) === -1) continue
       const playerId = this.#alivePlayerIds[i]
+      if (this.#deadPlayerIds.indexOf(playerId) === -1) continue
+
       newDeadPlayers.push(playerId)
       this.#alivePlayerIds.splice(playerId, 1)
       this.#players[playerId].lose()
