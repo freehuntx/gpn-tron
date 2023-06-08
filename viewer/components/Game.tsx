@@ -142,28 +142,13 @@ export function Game() {
         }
       }*/
 
-      // Render players
+      // Render player path and head
       for (let i = 0; i < game.players.length; i++) {
-        let { alive, name, pos: { x, y }, moves, chat } = game.players[i]
+        const { alive, pos: { x, y }, moves } = game.players[i]
         if (!alive) continue
 
         const playerColor = getColor(i)
-        x -= view.x
-        y - view.y
-        x *= factoredRoomSize
-        y *= factoredRoomSize
-        x += factoredHalfRoomSize
-        y += factoredHalfRoomSize
-
-        const textHeight = 18
-
-        offScreenContext.font = `bold ${textHeight}px serif`
-        const nameMetrics = offScreenContext.measureText(name)
-
-        const nameX = x - nameMetrics.width / 2 - 10
-        const nameY = y - textHeight * 3 - 5
-
-        // Draw player path
+        // Render paths
         for (let moveIndex = 0; moveIndex < moves.length; moveIndex++) {
           if (moveIndex === 0) continue
           const prevPos = moves[moveIndex - 1]
@@ -198,11 +183,33 @@ export function Game() {
           offScreenContext.fill()
         }
 
-        // Draw player circle
+        // Draw head
         offScreenContext.fillStyle = playerColor
         offScreenContext.beginPath()
         offScreenContext.arc(x, y, playerRadius, 0, 2 * Math.PI, false);
         offScreenContext.fill()
+      }
+
+      // Render name and chat
+      for (let i = 0; i < game.players.length; i++) {
+        let { alive, name, pos: { x, y }, moves, chat } = game.players[i]
+        if (!alive) continue
+
+        const playerColor = getColor(i)
+        x -= view.x
+        y - view.y
+        x *= factoredRoomSize
+        y *= factoredRoomSize
+        x += factoredHalfRoomSize
+        y += factoredHalfRoomSize
+
+        const textHeight = 18
+
+        offScreenContext.font = `bold ${textHeight}px serif`
+        const nameMetrics = offScreenContext.measureText(name)
+
+        const nameX = x - nameMetrics.width / 2 - 10
+        const nameY = y - textHeight * 3 - 5
 
         // Draw name box
         offScreenContext.fillStyle = playerColor
