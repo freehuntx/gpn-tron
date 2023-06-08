@@ -9,7 +9,7 @@ export class WsStateServer<WsStateType> {
   #io: IoServer
   #state: WsStateType
 
-  constructor(port: number, initialState = {} as WsStateType, updateInterval = 1000 / 5) {
+  constructor(port: number, initialState = {} as WsStateType, updateInterval = 1000 / 15) {
     this.#server = createServer()
     this.#io = new IoServer(this.#server, { cors: { origin: '*' } })
 

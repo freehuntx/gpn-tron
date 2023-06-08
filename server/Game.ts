@@ -49,8 +49,7 @@ export class Game extends EventEmitter {
     this.#initializeGame()
     this.#initializeState()
 
-    const tickInterval = setInterval(() => this.#onTick(), 1000 / tickrate)
-    this.once('end', () => clearInterval(tickInterval))
+    setTimeout(() => this.#onTick(), 1000 / tickrate)
   }
 
   broadcast(type: string, ...args: any) {
@@ -245,6 +244,7 @@ export class Game extends EventEmitter {
       this.emit('end', winners)
     } else {
       this.broadcast('tick')
+      setTimeout(() => this.#onTick(), 1000 / tickrate)
     }
   }
 }
