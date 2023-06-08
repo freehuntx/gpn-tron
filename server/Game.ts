@@ -99,6 +99,8 @@ export class Game extends EventEmitter {
     }
 
     this.#broadcastPos()
+    // Let players know that this is the end of the player list.
+    this.broadcast('tick')
   }
 
   #broadcastPos() {
