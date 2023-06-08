@@ -15,7 +15,6 @@ export type Score = {
 
 export type ScoreHistory = Score[]
 
-
 export class Game extends EventEmitter {
   #id: string
   #players: Player[]
@@ -66,7 +65,6 @@ export class Game extends EventEmitter {
       width: this.#width,
       height: this.#height,
       players: this.#players.map(({ state }) => state),
-      fields: this.#fields
     }
   }
 

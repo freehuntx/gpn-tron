@@ -15,5 +15,4 @@ interface GameState {
   width: number
   height: number
   players: PlayerState[]
-  fields: Array<Array<number>>
 }

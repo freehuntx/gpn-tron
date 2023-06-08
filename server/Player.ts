@@ -61,7 +61,8 @@ export class Player extends EventEmitter {
     this.#state = {
       alive: false,
       name: this.#username,
-      pos: this.#pos
+      pos: this.#pos,
+      moves: []
     }
   }
 
@@ -80,6 +81,7 @@ export class Player extends EventEmitter {
   }
 
   spawn(x: number, y: number) {
+    this.#state.moves = []
     this.setPos(x, y)
     this.#state.alive = true
   }
@@ -89,6 +91,7 @@ export class Player extends EventEmitter {
     this.#pos.y = y
     this.#state.pos.x = x
     this.#state.pos.y = y
+    this.#state.moves.push({ x, y })
   }
 
   disconnect() {
@@ -150,6 +153,7 @@ export class Player extends EventEmitter {
         }
       }
     } else {
+      console.log('UNKNOWN PACKET')
       this.sendError('unknown packet')
     }
   }

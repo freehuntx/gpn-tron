@@ -156,7 +156,6 @@ export class GameServer {
 
     // Lets listen to the game end event
     this.#game.once('end', (winners: Player[]) => {
-      this.#game.removeAllListeners()
       this.#game = undefined
 
       this.#viewServer.state.lastWinners = winners.map(({ username }) => username)

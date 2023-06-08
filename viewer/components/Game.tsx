@@ -80,29 +80,50 @@ export function Game() {
       const factoredHalfWallSize = factoredWallSize / 2
       const factoredHalfRoomSize = factoredRoomSize / 2
       const factoredFloorSize = floorSize * view.factor
+      const playerRadius = factoredFloorSize * 0.4
 
       // Clear frame
-      offScreenContext.fillStyle = 'black'
+      offScreenContext.fillStyle = '#090a35'
+      offScreenContext.clearRect(0, 0, canvas.width, canvas.height)
       offScreenContext.fillRect(0, 0, canvas.width, canvas.height)
 
       // Render walls
+      offScreenContext.strokeStyle = 'white'
+      offScreenContext.lineWidth = 1
       for (let x = 0; x < game.width; x++) {
+        let tmpX = x - view.x
+        tmpX *= factoredRoomSize
+
+        offScreenContext.beginPath()
+        offScreenContext.moveTo(tmpX, 0)
+        offScreenContext.lineTo(tmpX, canvas.height)
+        offScreenContext.stroke()
+
         for (let y = 0; y < game.height; y++) {
-          let tmpX = x - view.x
           let tmpY = y - view.y
-          tmpX *= factoredRoomSize
           tmpY *= factoredRoomSize
 
-          const clearX = tmpX + factoredHalfWallSize
-          const clearY = tmpY + factoredHalfWallSize
-          offScreenContext.fillStyle = "white"
-          offScreenContext.fillRect(tmpX - factoredHalfWallSize, tmpY - factoredHalfWallSize, factoredRoomSize + factoredWallSize, factoredRoomSize + factoredWallSize)
-          offScreenContext.clearRect(clearX, clearY, factoredFloorSize, factoredFloorSize)
+          offScreenContext.beginPath()
+          offScreenContext.moveTo(0, tmpY)
+          offScreenContext.lineTo(canvas.width, tmpY)
+          offScreenContext.stroke()
+
+          //let tmpX = x - view.x
+          //let tmpY = y - view.y
+          //tmpX *= factoredRoomSize
+          //tmpY *= factoredRoomSize
+
+          //offScreenContext.strokeStyle = 'white'
+          //offScreenContext.strokeRect(tmpX, tmpY, factoredRoomSize, factoredRoomSize)
+
+          //const clearX = tmpX + factoredHalfWallSize
+          //const clearY = tmpY + factoredHalfWallSize
+          //offScreenContext.fillStyle = "white"
+          //offScreenContext.fillRect(tmpX - factoredHalfWallSize, tmpY - factoredHalfWallSize, factoredRoomSize + factoredWallSize, factoredRoomSize + factoredWallSize)
+          //offScreenContext.clearRect(clearX, clearY, factoredFloorSize, factoredFloorSize)
         }
       }
-
-      // Render paths
-      for (let x = 0; x < game.width; x++) {
+      /*for (let x = 0; x < game.width; x++) {
         for (let y = 0; y < game.height; y++) {
           const fieldPlayerIndex = game.fields[x][y]
           const fieldPlayer = game.players[fieldPlayerIndex]
@@ -119,11 +140,11 @@ export function Game() {
           offScreenContext.fillStyle = playerColor
           offScreenContext.fillRect(clearX, clearY, factoredFloorSize, factoredFloorSize)
         }
-      }
+      }*/
 
       // Render players
       for (let i = 0; i < game.players.length; i++) {
-        let { alive, name, pos: { x, y }, chat } = game.players[i]
+        let { alive, name, pos: { x, y }, moves, chat } = game.players[i]
         if (!alive) continue
 
         const playerColor = getColor(i)
@@ -134,7 +155,6 @@ export function Game() {
         x += factoredHalfRoomSize
         y += factoredHalfRoomSize
 
-        const playerRadius = factoredFloorSize * 0.4
         const textHeight = 18
 
         offScreenContext.font = `bold ${textHeight}px serif`
@@ -143,17 +163,46 @@ export function Game() {
         const nameX = x - nameMetrics.width / 2 - 10
         const nameY = y - textHeight * 3 - 5
 
+        // Draw player path
+        for (let moveIndex = 0; moveIndex < moves.length; moveIndex++) {
+          if (moveIndex === 0) continue
+          const prevPos = moves[moveIndex - 1]
+          const pos = moves[moveIndex]
+          if (prevPos.x === 0 && pos.x === game.width - 1) continue
+          if (prevPos.x === game.width - 1 && pos.x === 0) continue
+          if (prevPos.y === 0 && pos.y === game.height - 1) continue
+          if (prevPos.y === game.height - 1 && pos.y === 0) continue
+
+          const fromX = prevPos.x * factoredRoomSize + factoredRoomSize / 2
+          const fromY = prevPos.y * factoredRoomSize + factoredRoomSize / 2
+          const toX = pos.x * factoredRoomSize + factoredRoomSize / 2
+          const toY = pos.y * factoredRoomSize + factoredRoomSize / 2
+
+          offScreenContext.fillStyle = playerColor
+          offScreenContext.beginPath()
+          offScreenContext.arc(x, y, playerRadius, 0, 2 * Math.PI, false);
+          offScreenContext.fill()
+
+          offScreenContext.strokeStyle = playerColor
+          offScreenContext.lineWidth = playerRadius * 2
+          offScreenContext.beginPath()
+          offScreenContext.moveTo(fromX, fromY)
+          offScreenContext.lineTo(toX, toY)
+          offScreenContext.stroke()
+
+          offScreenContext.beginPath()
+          offScreenContext.arc(fromX, fromY, playerRadius, 0, 2 * Math.PI, false);
+          offScreenContext.fill()
+          offScreenContext.beginPath()
+          offScreenContext.arc(toX, toY, playerRadius, 0, 2 * Math.PI, false);
+          offScreenContext.fill()
+        }
+
         // Draw player circle
         offScreenContext.fillStyle = playerColor
         offScreenContext.beginPath()
         offScreenContext.arc(x, y, playerRadius, 0, 2 * Math.PI, false);
         offScreenContext.fill()
-
-        // Draw player outer circle
-        offScreenContext.fillStyle = 'black'
-        offScreenContext.beginPath()
-        offScreenContext.arc(x, y, playerRadius, 0, 2 * Math.PI, false);
-        offScreenContext.stroke()
 
         // Draw name box
         offScreenContext.fillStyle = playerColor
@@ -190,22 +239,7 @@ export function Game() {
 
   return (
     <div style={{ display: 'flex', width: '100%', height: '100%' }}>
-      <div style={{
-        position: 'absolute',
-        zIndex: 0,
-        top: canvasRef.current ? canvasRef.current.offsetTop + 'px' : 0,
-        left: canvasRef.current ? canvasRef.current.offsetLeft + 'px' : 0,
-        width: canvasRef.current ? canvasRef.current.width + 'px' : 0,
-        height: canvasRef.current ? canvasRef.current.height + 'px' : 0,
-        opacity: 0.5,
-        backgroundSize: 'cover',
-        backgroundImage: `url(https://thiscatdoesnotexist.com/?rand=${game?.id})`
-      }}>
-      </div>
-      <canvas ref={canvasRef} style={{
-        margin: 'auto',
-        zIndex: 1,
-      }}></canvas>
+      <canvas ref={canvasRef} style={{ margin: 'auto' }}></canvas>
     </div>
   )
 }

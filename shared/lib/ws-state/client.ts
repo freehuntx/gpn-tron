@@ -17,7 +17,7 @@ export class WsStateClient<WsStateType> extends EventEmitter {
     })
 
     this.#socket.on('patch', patch => {
-      Object.apply(this.#state, applyPatch(this.#state, patch))
+      this.#state = applyPatch(this.#state, patch).newDocument
       this.emit('update')
     })
   }
