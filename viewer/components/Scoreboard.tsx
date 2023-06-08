@@ -24,7 +24,7 @@ export function Scoreboard() {
   });
 
   return (
-    <>
+    <div style={{ display: 'flex' }}>
       <table style={{ width: '100%', textAlign: 'left' }}>
         <thead>
           <tr>
@@ -73,6 +73,6 @@ export function Scoreboard() {
           <Line key={key} dot={false} dataKey={key} stroke={stroke} />
         ))}
       </LineChart>
-    </>
+    </div>
   )
 }

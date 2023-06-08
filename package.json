@@ -8,7 +8,8 @@
   "scripts": {
     "dev:server": "yarn workspace @gpn-tron/server run dev",
     "dev:viewer": "yarn workspace @gpn-tron/viewer run dev",
-    "dev": "concurrently -n server,viewer \"yarn dev:server\" \"yarn dev:viewer\""
+    "dev": "concurrently -n server,viewer \"yarn dev:server\" \"yarn dev:viewer\"",
+    "autopull": "node git-auto-pull.js"
   },
   "stackblitz": {
     "installDependencies": false,

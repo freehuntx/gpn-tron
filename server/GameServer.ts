@@ -12,7 +12,7 @@ const GAME_DATA_PATH = `${tmpdir()}/gpn-tron-data.json`
 const HOSTNAMES = Object.values(networkInterfaces())
   .map(e => e || [])
   .flat()
-  .filter(e => !e.internal && String(e.family).includes('4'))
+  .filter(e => !e.internal && String(e.family))
   .map(({ address }) => address)
 // HOSTNAMES.unshift('gpn-mazing.v6.rocks')
 
