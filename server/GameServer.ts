@@ -16,8 +16,6 @@ const HOSTNAMES = Object.values(networkInterfaces())
   .map(({ address }) => address)
 HOSTNAMES.unshift('gpn-tron.duckdns.org')
 
-if (HOSTNAMES.length === 0) throw new Error('Failed getting external ips!')
-
 export class GameServer {
   #port: number // Port number of the game tcp server
   #tcpServer: Server // TCP Server instance

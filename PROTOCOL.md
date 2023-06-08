@@ -87,6 +87,16 @@ The pos packet is sent by the server to inform the client about a players curren
 
 **Example:** `pos|5|3|8`
 
+### tick
+
+The tick packet is sent by the server after a turn has been done. Its the best to send a move packet after this!
+
+**Name:** tick  
+**Sender:** Server  
+**Arguments:**  None
+
+**Example:** `tick`
+
 ### die
 
 The die packet is sent by the server to inform the client about a players who died.

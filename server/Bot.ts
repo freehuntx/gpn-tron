@@ -6,6 +6,7 @@ export class Bot {
   #port: number
   #connected = false
   #name: string
+  #pos: Vec2 = { x: 0, y: 0 }
   #ingame = false
   #playerId: number
   #width: number
@@ -82,6 +83,7 @@ export class Bot {
       const [width, height, playerId] = args as number[]
       this.#ingame = true
       this.#playerId = playerId
+      this.#pos = { x: 0, y: 0 }
       this.#width = width
       this.#height = height
       this.#fields = Array(width).fill(null).map(() => Array(height).fill(-1))
@@ -105,38 +107,42 @@ export class Bot {
       const [playerId, x, y] = args as number[]
       this.#fields[x][y] = playerId
 
-      // If its us, try to find a free field to move to
       if (playerId === this.#playerId) {
-        const possibleMoves: Record<string, boolean> = {}
-
-        if (y === 0 && this.#fields[x][this.#height - 1] === -1) {
-          possibleMoves.up = true
-        }
-        if (y > 0 && this.#fields[x][y - 1] === -1) {
-          possibleMoves.up = true
-        }
-        if (x === this.#width - 1 && this.#fields[0][y] === -1) {
-          possibleMoves.right = true
-        }
-        if (x < this.#width - 1 && this.#fields[x + 1][y] === -1) {
-          possibleMoves.right = true
-        }
-        if (y === this.#height - 1 && this.#fields[x][0] === -1) {
-          possibleMoves.down = true
-        }
-        if (y < this.#height - 1 && this.#fields[x][y + 1] === -1) {
-          possibleMoves.down = true
-        }
-        if (x === 0 && this.#fields[this.#width - 1][y] === -1) {
-          possibleMoves.left = true
-        }
-        if (x > 0 && this.#fields[x - 1][y] === -1) {
-          possibleMoves.left = true
-        }
-
-        const possibleArr = Object.keys(possibleMoves)
-        if (possibleArr.length) this.send('move', possibleArr[Math.floor(Math.random() * possibleArr.length)])
+        this.#pos.x = x
+        this.#pos.y = y
       }
+    }
+    else if (type === 'tick') {
+      const { x, y } = this.#pos
+      const possibleMoves: Record<string, boolean> = {}
+
+      if (y === 0 && this.#fields[x][this.#height - 1] === -1) {
+        possibleMoves.up = true
+      }
+      if (y > 0 && this.#fields[x][y - 1] === -1) {
+        possibleMoves.up = true
+      }
+      if (x === this.#width - 1 && this.#fields[0][y] === -1) {
+        possibleMoves.right = true
+      }
+      if (x < this.#width - 1 && this.#fields[x + 1][y] === -1) {
+        possibleMoves.right = true
+      }
+      if (y === this.#height - 1 && this.#fields[x][0] === -1) {
+        possibleMoves.down = true
+      }
+      if (y < this.#height - 1 && this.#fields[x][y + 1] === -1) {
+        possibleMoves.down = true
+      }
+      if (x === 0 && this.#fields[this.#width - 1][y] === -1) {
+        possibleMoves.left = true
+      }
+      if (x > 0 && this.#fields[x - 1][y] === -1) {
+        possibleMoves.left = true
+      }
+
+      const possibleArr = Object.keys(possibleMoves)
+      if (possibleArr.length) this.send('move', possibleArr[Math.floor(Math.random() * possibleArr.length)])
     }
   }
 }

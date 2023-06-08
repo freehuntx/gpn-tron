@@ -233,6 +233,8 @@ export class Game extends EventEmitter {
       }
 
       this.emit('end', winners)
+    } else {
+      this.broadcast('tick')
     }
   }
 }
