@@ -199,7 +199,7 @@ export class Game extends EventEmitter {
       if (this.#deadPlayerIds.indexOf(playerId) === -1) continue
 
       newDeadPlayers.push(playerId)
-      this.#alivePlayerIds.splice(playerId, 1)
+      this.#alivePlayerIds.splice(i, 1)
       this.#players[playerId].lose()
     }
 
