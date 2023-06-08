@@ -10,6 +10,7 @@
     "multi-elo": "^2.2.0"
   },
   "devDependencies": {
+    "@types/node": "^20.2.5",
     "tsx": "^3.12.7"
   }
 }
