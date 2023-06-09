@@ -20,6 +20,7 @@ export class Player extends EventEmitter {
   #scoreHistory: ScoreHistory = []
   #eloScore = 1000
   #state: PlayerState
+  #chatTimeout: NodeJS.Timeout
 
   constructor(username: string, password: string) {
     super()
@@ -131,26 +132,23 @@ export class Player extends EventEmitter {
       else this.sendError('WARNING_UNKNOWN_MOVE')
     }
     else if (packetType === 'chat') {
-      if (this.#chatMessage !== undefined) {
-        this.sendError('already chatting')
+      const [chatMessage] = args
+
+      // Check if the chat message contains printable characters
+      if (!/^[ -~]+$/.test(chatMessage)) {
+        this.sendError('ERROR_INVALID_CHAT_MESSAGE')
       } else {
-        const [chatMessage] = args
+        this.#chatMessage = chatMessage
+        this.#state.chat = chatMessage
 
-        // Check if the chat message contains printable characters
-        if (!/^[ -~]+$/.test(chatMessage)) {
-          this.sendError('invalid chat message')
-        } else {
-          this.#chatMessage = chatMessage
-          this.#state.chat = chatMessage
+        this.emit('chat', chatMessage)
 
-          this.emit('chat', chatMessage)
-
-          // Clear the chat message in 5 seconds
-          setTimeout(() => {
-            this.#chatMessage = undefined
-            this.#state.chat = undefined
-          }, 5000)
-        }
+        // Clear the chat message in 5 seconds
+        clearTimeout(this.#chatTimeout)
+        this.#chatTimeout = setTimeout(() => {
+          this.#chatMessage = undefined
+          this.#state.chat = undefined
+        }, 5000)
       }
     } else {
       console.log('UNKNOWN PACKET')
