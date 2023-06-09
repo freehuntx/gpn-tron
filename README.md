@@ -5,10 +5,11 @@ A bot clash project for the [GPN21](https://entropia.de/GPN21) (Gulasch Programm
 It creates an TCP server where people can connect to and control their player.  
 The challenge: Create a bot that beats the other players!
 
-## Prequisites
-- [NodeJS](https://nodejs.org/en)
-- [NPM](https://docs.npmjs.com)
-- An decent browser (For opening the viewer page)
+## Prerequisites
+- [NodeJS](https://nodejs.org/en) `apt get install nodejs npm` 
+- [NPM](https://docs.npmjs.com) `see command above` 
+- [Yarn](https://docs.npmjs.com)`apt get install yarn` 
+- A decent browser (For opening the viewer page)
 
 ## Installation
 1. Clone this repo  
