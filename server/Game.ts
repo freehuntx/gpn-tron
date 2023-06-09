@@ -101,7 +101,7 @@ export class Game extends EventEmitter {
 
       // Watch for chat messages and share them with all players
       const onChat = message => {
-        this.broadcast('message', playerIndex, message)
+        this.broadcastToAlive('message', playerIndex, message)
       }
       player.on('chat', onChat)
 

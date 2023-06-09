@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events'
 import { ClientSocket } from './ClientSocket'
 import { ScoreHistory, ScoreType } from './Game'
+import { escapeString, isStringValid } from '@gpn-tron/shared/utils/string'
 
 export enum PlayerAction {
   NONE,
@@ -15,6 +16,7 @@ export class Player extends EventEmitter {
   #username: string
   #password: string
   #chatMessage?: string
+  #alive = false
   #pos = { x: 0, y: 0 }
   #action: PlayerAction = PlayerAction.NONE
   #scoreHistory: ScoreHistory = []
@@ -32,6 +34,8 @@ export class Player extends EventEmitter {
 
   get username(): string { return this.#username }
   get password(): string { return this.#password }
+  get alive(): boolean { return this.#alive }
+  get chatMessage(): string { return this.#chatMessage }
   get pos(): { x: number; y: number } { return this.#pos }
   get connected(): boolean { return !!this.#socket?.connected }
   get eloScore(): number { return this.#eloScore }
@@ -82,9 +86,10 @@ export class Player extends EventEmitter {
   }
 
   spawn(x: number, y: number) {
+    this.#alive = true
+    this.#state.alive = true
     this.#state.moves = []
     this.setPos(x, y)
-    this.#state.alive = true
   }
 
   setPos(x: number, y: number) {
@@ -115,6 +120,7 @@ export class Player extends EventEmitter {
   lose() {
     this.#scoreHistory.push({ type: ScoreType.LOOSE, time: Date.now() })
     this.#socket?.send('lose', this.wins, this.loses)
+    this.#alive = false
     this.#state.alive = false
   }
 
@@ -132,10 +138,12 @@ export class Player extends EventEmitter {
       else this.sendError('WARNING_UNKNOWN_MOVE')
     }
     else if (packetType === 'chat') {
-      const [chatMessage] = args
+      const chatMessage = escapeString(args[0] || '')
 
-      // Check if the chat message contains printable characters
-      if (!/^[ -~]+$/.test(chatMessage)) {
+      if (!this.#alive) {
+        this.sendError('ERROR_DEAD_CANNOT_CHAT')
+      }
+      else if (!isStringValid(chatMessage)) {
         this.sendError('ERROR_INVALID_CHAT_MESSAGE')
       } else {
         this.#chatMessage = chatMessage

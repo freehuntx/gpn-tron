@@ -2,6 +2,7 @@ import { networkInterfaces, tmpdir } from 'os'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { createServer, Server, Socket } from 'net'
 import { joinTimeout, maxConnections } from '@gpn-tron/shared/constants/common'
+import { isStringValid } from '@gpn-tron/shared/utils/string'
 import { WsStateServer } from '@gpn-tron/shared/lib/ws-state/server'
 import { ClientSocket } from './ClientSocket'
 import { Player } from './Player'
@@ -204,7 +205,7 @@ export class GameServer {
       if (username.length < 1) return clientSocket.sendError('ERROR_USERNAME_TOO_SHORT', true)
       if (username.length > 32) return clientSocket.sendError('ERROR_USERNAME_TOO_LONG', true)
 
-      if (!/^[ -~]+$/.test(username)) return clientSocket.sendError('ERROR_USERNAME_INVALID_SYMBOLS', true)
+      if (!isStringValid(username)) return clientSocket.sendError('ERROR_USERNAME_INVALID_SYMBOLS', true)
 
       // Check the password
       if (typeof password !== "string") return clientSocket.sendError('ERROR_INVALID_PASSWORD', true)
