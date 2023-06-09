@@ -6,8 +6,12 @@ It creates an TCP server where people can connect to and control their player.
 The challenge: Create a bot that beats the other players!
 
 ## Prequisites
-- [NodeJS](https://nodejs.org/en)
-- [NPM](https://docs.npmjs.com)
+- [NodeJS](https://nodejs.org/en)  
+  `apt get install nodejs npm` 
+- [NPM](https://docs.npmjs.com)  
+  `see command above` 
+- [Yarn](https://docs.npmjs.com)  
+  `apt get install yarn` 
 - An decent browser (For opening the viewer page)
 
 ## Installation
@@ -15,11 +19,11 @@ The challenge: Create a bot that beats the other players!
 `git clone git@github.com:freehuntx/gpn-tron.git`
 2. Enter the folder  
 `cd gpn-tron`
-3. Install the dependencies  
-`npm install`
+3. Install the dependencies (You need yarn as this repo uses yarn workspace)  
+`yarn`
 
 ## Start
-1. Start the servers  
-Game server: `npm run dev:server`  
-View server: `npm run dev:viewer`
-2. Open the viewer in the browser (See console output for the address)
+1. Start the servers in dev mode  
+  `yarn dev`  
+2. Open the viewer in the browser  
+  `http://localhost:3000`
