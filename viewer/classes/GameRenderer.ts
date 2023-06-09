@@ -206,7 +206,7 @@ export class GameRenderer {
 
       // Draw name box
       this.#offScreenContext.fillStyle = playerColor
-      this.#offScreenContext.strokeStyle = 'gray'
+      this.#offScreenContext.strokeStyle = 'white'
       this.#offScreenContext.lineWidth = 2
       this.#offScreenContext.beginPath()
       this.#offScreenContext.rect(nameX, nameY, nameMetrics.width + 10, textHeight + 10)
@@ -215,7 +215,7 @@ export class GameRenderer {
 
       // Draw player name
       this.#offScreenContext.textBaseline = 'top'
-      this.#offScreenContext.fillStyle = 'gray'
+      this.#offScreenContext.fillStyle = 'white'
       this.#offScreenContext.fillText(name, nameX + 5, nameY + 5)
     }
   }
