@@ -57,6 +57,12 @@ export class Game extends EventEmitter {
     setTimeout(() => this.#onTick(), 1000 / baseTickrate)
   }
 
+  broadcastToAlive(type: string, ...args: any) {
+    for (const playerIndex of this.#alivePlayerIds) {
+      this.#players[playerIndex].send(type, ...args)
+    }
+  }
+
   broadcast(type: string, ...args: any) {
     this.#players.forEach(player => {
       player.send(type, ...args)
@@ -75,9 +81,9 @@ export class Game extends EventEmitter {
   #initializeFields() {
     this.#fields = Array(this.#width).fill(null).map(() => Array(this.#height).fill(-1))
 
-    for (let i=0; i<this.#players.length; i++) {
-      const x = i*2
-      const y = i*2
+    for (let i = 0; i < this.#players.length; i++) {
+      const x = i * 2
+      const y = i * 2
       this.#fields[x][y] = i // Set the current player id to the spawn field
       this.#players[i].spawn(x, y)
     }
@@ -105,8 +111,7 @@ export class Game extends EventEmitter {
     }
 
     this.#broadcastPos()
-    // Let players know that this is the end of the player list.
-    this.broadcast('tick')
+    this.broadcastToAlive('tick')
   }
 
   #broadcastPos() {
@@ -251,7 +256,7 @@ export class Game extends EventEmitter {
 
       this.emit('end', winners)
     } else {
-      this.broadcast('tick')
+      this.broadcastToAlive('tick')
 
       // Dynamically define tickrate
       const timeDiff = Date.now() - this.#startTime
