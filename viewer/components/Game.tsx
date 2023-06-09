@@ -6,6 +6,15 @@ const wallSize = 1
 const floorSize = 16
 const roomSize = floorSize + wallSize
 
+const drawPlayerLine = (context: CanvasRenderingContext2D, playerRadius: number, color: string, from: Vec2, to: Vec2) => {
+  context.strokeStyle = color
+  context.lineWidth = playerRadius * 2
+  context.beginPath()
+  context.moveTo(from.x, from.y)
+  context.lineTo(to.x, to.y)
+  context.stroke()
+}
+
 export function Game() {
   const { game } = useGame()
   const [offScreenCanvas] = useState<HTMLCanvasElement>(document.createElement('canvas'))
@@ -158,33 +167,74 @@ export function Game() {
           if (moveIndex === 0) continue
           const prevPos = moves[moveIndex - 1]
           const pos = moves[moveIndex]
-          if (prevPos.x === 0 && pos.x === game.width - 1) continue
-          if (prevPos.x === game.width - 1 && pos.x === 0) continue
-          if (prevPos.y === 0 && pos.y === game.height - 1) continue
-          if (prevPos.y === game.height - 1 && pos.y === 0) continue
 
-          const fromX = prevPos.x * factoredRoomSize + factoredRoomSize / 2
-          const fromY = prevPos.y * factoredRoomSize + factoredRoomSize / 2
-          const toX = pos.x * factoredRoomSize + factoredRoomSize / 2
-          const toY = pos.y * factoredRoomSize + factoredRoomSize / 2
+          let prevX = prevPos.x
+          let prevY = prevPos.y
+          let posX = pos.x
+          let posY = pos.y
 
+          if (prevPos.x === 0 && pos.x === game.width - 1) {
+            prevX = 0
+            posX = -1
+            drawPlayerLine(offScreenContext, playerRadius, playerColor, {
+              x: game.width * factoredRoomSize + factoredRoomSize / 2,
+              y: pos.y * factoredRoomSize + factoredRoomSize / 2
+            }, {
+              x: (game.width-1) * factoredRoomSize + factoredRoomSize / 2,
+              y: pos.y * factoredRoomSize + factoredRoomSize / 2
+            })
+          }
+          if (prevPos.x === game.width - 1 && pos.x === 0) {
+            prevX = game.width - 1
+            posX = game.width
+            drawPlayerLine(offScreenContext, playerRadius, playerColor, {
+              x: -1 * factoredRoomSize + factoredRoomSize / 2,
+              y: pos.y * factoredRoomSize + factoredRoomSize / 2
+            }, {
+              x: 0 * factoredRoomSize + factoredRoomSize / 2,
+              y: pos.y * factoredRoomSize + factoredRoomSize / 2
+            })
+          }
+          if (prevPos.y === 0 && pos.y === game.height - 1) {
+            prevY = 0
+            posY = -1
+            drawPlayerLine(offScreenContext, playerRadius, playerColor, {
+              x: pos.x * factoredRoomSize + factoredRoomSize / 2,
+              y: game.height * factoredRoomSize + factoredRoomSize / 2
+            }, {
+              x: pos.x * factoredRoomSize + factoredRoomSize / 2,
+              y: (game.height-1) * factoredRoomSize + factoredRoomSize / 2
+            })
+          }
+          if (prevPos.y === game.height - 1 && pos.y === 0) {
+            prevY = game.height - 1
+            posY = game.height
+            drawPlayerLine(offScreenContext, playerRadius, playerColor, {
+              x: pos.x * factoredRoomSize + factoredRoomSize / 2,
+              y: -1 * factoredRoomSize + factoredRoomSize / 2
+            }, {
+              x: pos.x * factoredRoomSize + factoredRoomSize / 2,
+              y: 0 * factoredRoomSize + factoredRoomSize / 2
+            })
+          }
+
+          const fromX = prevX * factoredRoomSize + factoredRoomSize / 2
+          const fromY = prevY * factoredRoomSize + factoredRoomSize / 2
+          const toX = posX * factoredRoomSize + factoredRoomSize / 2
+          const toY = posY * factoredRoomSize + factoredRoomSize / 2
+
+          // Draw start head
           offScreenContext.fillStyle = playerColor
           offScreenContext.beginPath()
           offScreenContext.arc(x, y, playerRadius, 0, 2 * Math.PI, false);
           offScreenContext.fill()
 
-          offScreenContext.strokeStyle = playerColor
-          offScreenContext.lineWidth = playerRadius * 2
-          offScreenContext.beginPath()
-          offScreenContext.moveTo(fromX, fromY)
-          offScreenContext.lineTo(toX, toY)
-          offScreenContext.stroke()
+          // Draw player line
+          drawPlayerLine(offScreenContext, playerRadius, playerColor, { x: fromX, y: fromY }, { x: toX, y: toY })
 
+          // Draw corners
           offScreenContext.beginPath()
           offScreenContext.arc(fromX, fromY, playerRadius, 0, 2 * Math.PI, false);
-          offScreenContext.fill()
-          offScreenContext.beginPath()
-          offScreenContext.arc(toX, toY, playerRadius, 0, 2 * Math.PI, false);
           offScreenContext.fill()
         }
 
