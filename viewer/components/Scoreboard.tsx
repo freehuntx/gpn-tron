@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   LineChart,
   Line,
@@ -6,11 +6,24 @@ import {
   YAxis,
   Legend
 } from 'recharts'
-import { useGame } from '../providers/Game'
 import { getColor } from '@gpn-tron/shared/constants/colors'
+import gameService from '../services/GameService'
 
 export function Scoreboard() {
-  const { chartData, scoreboard } = useGame()
+  const [chartData, setChartData] = useState<ChartData>([])
+  const [scoreboard, setScoreboard] = useState<Scoreboard>([])
+
+  useEffect(() => {
+    const onUpdate = () => {
+      setChartData(gameService.chartData)
+      setScoreboard(gameService.scoreboard)
+    }
+    gameService.on('update', onUpdate)
+
+    return () => {
+      gameService.off('update', onUpdate)
+    }
+  }, [])
 
   const lines: Record<string, any> = {};
   chartData.forEach((point) => {

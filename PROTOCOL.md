@@ -149,7 +149,7 @@ The message packet is sent by the server to inform about a chat message of anoth
 | 1 | Number | The player id |
 | 2 | String | The chat message to display |
 
-**Example:** `message|5|I am so cool`
+**Example:** `message|7|I am so cool`
 
 ### win
 

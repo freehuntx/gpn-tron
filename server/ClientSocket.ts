@@ -6,8 +6,6 @@ export class ClientSocket extends EventEmitter {
   #connected = false
   #ip: string
   #socket?: Socket
-  #recvBuffer = ''
-  //#recvPacketCount = 0
 
   /**
    * Create a ClientSocket instance from a tcp socket instance
@@ -33,6 +31,8 @@ export class ClientSocket extends EventEmitter {
     this.#socket = socket
     this.#ip = socket.remoteAddress
 
+    let buffer = ''
+
     this.#socket.on('data', chunk => {
       // More than x packets per second can be considered as spam.
       // Increase packet recv counter by 1 and check if its above the max
@@ -45,17 +45,18 @@ export class ClientSocket extends EventEmitter {
       //  this.#recvPacketCount--
       //}, 1000)
 
-      this.#recvBuffer += chunk.toString()
+      buffer += chunk.toString()
 
-      while (this.#connected && this.#recvBuffer.includes('\n')) {
-        const packetIndex = this.#recvBuffer.indexOf('\n')
-        const packetStr = this.#recvBuffer.substring(0, packetIndex)
-        this.#recvBuffer = this.#recvBuffer.substring(packetIndex + 1)
-        this.#onPacket(packetStr)
+      if (buffer.length > 1024) {
+        this.sendError('ERROR_PACKET_OVERFLOW', true)
+        return
       }
 
-      if (this.#recvBuffer.length > 1024) {
-        this.sendError('ERROR_PACKET_OVERFLOW', true)
+      while (this.#connected && buffer.includes('\n')) {
+        const packetIndex = buffer.indexOf('\n')
+        const packetStr = buffer.substring(0, packetIndex)
+        buffer = buffer.substring(packetIndex + 1)
+        this.#onPacket(packetStr)
       }
     })
 
@@ -71,6 +72,7 @@ export class ClientSocket extends EventEmitter {
     if (!this.#connected) return
 
     this.#connected = false
+    this.#socket.removeAllListeners()
     this.#socket?.end()
     this.#socket?.destroy()
     this.#socket = undefined
@@ -107,5 +109,6 @@ export class ClientSocket extends EventEmitter {
 
   #onError(error: Error & { code: string }) {
     if (error?.code !== 'ECONNRESET') console.error(error)
+    this.disconnect()
   }
 }

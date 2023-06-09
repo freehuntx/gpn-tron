@@ -13,7 +13,7 @@ const GAME_DATA_PATH = `${tmpdir()}/gpn-tron-data.json`
 const HOSTNAMES = Object.values(networkInterfaces())
   .map(e => e || [])
   .flat()
-  .filter(e => !e.internal && String(e.family))
+  .filter(e => !e.internal)
   .map(({ address }) => address)
 HOSTNAMES.unshift('gpn-tron.duckdns.org')
 
@@ -185,6 +185,7 @@ export class GameServer {
     })
 
     if (maxConnections >= 0 && this.#connectionIpMap[clientSocket.ip] > maxConnections && !clientSocket.ip.endsWith('127.0.0.1')) {
+      console.log(clientSocket.ip)
       return clientSocket.sendError('ERROR_MAX_CONNECTIONS', true)
     }
 

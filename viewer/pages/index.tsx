@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useGame } from '../providers/Game'
 import { Scoreboard } from '../components/Scoreboard'
 import { Game } from '../components/Game'
+import gameService from '../services/GameService'
 
 // Just a fun component to work around a broken screen on the GPN
 function BrokenScreenFun() {
@@ -19,33 +19,15 @@ function BrokenScreenFun() {
           height: 'calc(100%/4)'
         }}
       ></div>
-      {/* No Drake */}
       <img
-        src="https://i.ibb.co/GRKrvvL/5ee7713799588c0004aa6848.png"
-        ref={ref => {
-          if (!ref) return
-          ref.style.left = `calc(100% / 4 - ${ref.width}px)`
-        }}
+        src="https://i.ibb.co/QJxSCNk/a.jpg"
         style={{
           zIndex: 999,
           position: 'absolute',
-          top: 'calc(100%/4)',
-          height: 'calc(100%/4)',
-        }}
-      />
-      {/* Yes Drake */}
-      <img
-        src="https://i.ibb.co/vkQqdv9/5ee771dc99588c0004aa6849.png"
-        ref={ref => {
-          if (!ref) return
-          ref.style.left = `calc(100% / 2 - ${ref.width}px)`
-        }}
-        style={{
-          zIndex: 999,
-          position: 'absolute',
-          top: '0',
-          left: 'calc(100%/4*2)',
-          height: 'calc(100%/4)',
+          top: 0,
+          left: 'calc(100%/4)',
+          width: 'calc(100%/4)',
+          height: 'calc(100%/4)'
         }}
       />
     </>
@@ -54,20 +36,27 @@ function BrokenScreenFun() {
 
 export default function Home() {
   const [active, setActive] = useState(false)
-  const { serverInfoList, lastWinners, game } = useGame()
+  const [serverInfoList, setServerInfoList] = useState<ServerInfoList>([])
+  const [lastWinners, setLastWinners] = useState<LastWinners>([])
 
   useEffect(() => {
     // Do this to prevent SSR
     setActive(true)
+
+    gameService.on('update', () => {
+      setServerInfoList(gameService.serverInfoList)
+      setLastWinners(gameService.lastWinners)
+    })
   }, [])
 
-  if (!active || !game) return null
+  if (!active || !gameService.game) return null
   return (
     <>
       <BrokenScreenFun />
       <div style={{ display: 'flex', height: '100%', width: '100%' }}>
         <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, width: '100%' }}>
           <div style={{ flexGrow: 1, height: '100%' }}>
+            <h1>!!!Development state!!!</h1>
             <h3>Ports:</h3>
             <ul>
               <li>- 3000 [HTTP] (View server)</li>
@@ -96,7 +85,7 @@ export default function Home() {
           </div>
         </div>
         <div style={{ flexGrow: 1, width: '100%' }}>
-          {game && <Game />}
+          <Game />
         </div>
       </div>
     </>

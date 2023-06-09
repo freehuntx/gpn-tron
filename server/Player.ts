@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events'
+import { escapeString, isStringValid } from '@gpn-tron/shared/utils/string'
 import { ClientSocket } from './ClientSocket'
 import { ScoreHistory, ScoreType } from './Game'
-import { escapeString, isStringValid } from '@gpn-tron/shared/utils/string'
 
 export enum PlayerAction {
   NONE,
@@ -13,11 +13,13 @@ export enum PlayerAction {
 
 export class Player extends EventEmitter {
   #socket?: ClientSocket
+  #id = -1
+  #alive: boolean
   #username: string
   #password: string
   #chatMessage?: string
-  #alive = false
   #pos = { x: 0, y: 0 }
+  #moves: Vec2[] = []
   #action: PlayerAction = PlayerAction.NONE
   #scoreHistory: ScoreHistory = []
   #eloScore = 1000
@@ -32,15 +34,22 @@ export class Player extends EventEmitter {
     this.#initializeState()
   }
 
+  get id(): number { return this.#id }
+  set id(id: number) {
+    this.#id = id
+    this.#state.id = id
+  }
   get username(): string { return this.#username }
   get password(): string { return this.#password }
   get alive(): boolean { return this.#alive }
   get chatMessage(): string { return this.#chatMessage }
-  get pos(): { x: number; y: number } { return this.#pos }
+  get pos(): Vec2 { return this.#pos }
+  get moves(): Vec2[] { return this.#moves }
   get connected(): boolean { return !!this.#socket?.connected }
   get eloScore(): number { return this.#eloScore }
   set eloScore(eloScore: number) { this.#eloScore = eloScore }
   get state() { return this.#state }
+  get action(): PlayerAction { return this.#action }
 
   // Returns the time filtered scores. Everything above 2 hours is removed.
   get scoreHistory(): ScoreHistory {
@@ -64,6 +73,7 @@ export class Player extends EventEmitter {
 
   #initializeState() {
     this.#state = {
+      id: this.#id,
       alive: false,
       name: this.#username,
       pos: this.#pos,
@@ -71,22 +81,17 @@ export class Player extends EventEmitter {
     }
   }
 
-  readAndResetAction(): PlayerAction {
-    const action = this.#action
-    this.#action = PlayerAction.NONE
-    return action
-  }
-
   setSocket(socket: ClientSocket) {
     this.disconnect()
 
     this.#socket = socket
     this.#socket.on('packet', this.#onPacket.bind(this))
-    this.#socket.on('disconnected', this.#onDisconnect.bind(this))
+    this.#socket.on('disconnected', this.disconnect.bind(this))
   }
 
   spawn(x: number, y: number) {
     this.#alive = true
+    this.#moves = []
     this.#state.alive = true
     this.#state.moves = []
     this.setPos(x, y)
@@ -97,29 +102,43 @@ export class Player extends EventEmitter {
     this.#pos.y = y
     this.#state.pos.x = x
     this.#state.pos.y = y
+    this.#moves.push({ x, y })
     this.#state.moves.push({ x, y })
   }
 
   disconnect() {
+    let disconnected = this.connected
+    
+    this.#socket?.removeAllListeners()
     this.#socket?.disconnect()
+    this.#socket = undefined
+
+    if (disconnected) this.emit('disconnected')
   }
 
   send(type: string, ...args: any) {
+    if (!this.connected) return
     this.#socket?.send(type, ...args)
   }
 
   rawSend(packet: string) {
+    if (!this.connected) return
     this.#socket?.rawSend(packet)
   }
 
   win() {
     this.#scoreHistory.push({ type: ScoreType.WIN, time: Date.now() })
-    this.#socket?.send('win', this.wins, this.loses)
+    this.send('win', this.wins, this.loses)
   }
 
   lose() {
     this.#scoreHistory.push({ type: ScoreType.LOOSE, time: Date.now() })
-    this.#socket?.send('lose', this.wins, this.loses)
+    this.send('lose', this.wins, this.loses)
+    this.kill()
+  }
+
+  kill() {
+    if (!this.#alive) return
     this.#alive = false
     this.#state.alive = false
   }
@@ -162,12 +181,5 @@ export class Player extends EventEmitter {
       console.log('UNKNOWN PACKET')
       this.sendError('unknown packet')
     }
-  }
-
-  #onDisconnect() {
-    this.#socket = undefined
-    this.#chatMessage = undefined
-    this.#action = PlayerAction.NONE
-    this.emit('disconnected')
   }
 }

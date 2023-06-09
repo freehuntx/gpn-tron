@@ -1,16 +1,11 @@
-function getColorArray(num: number) {
-  var result = [];
-  for (var i = 0; i < num; i += 1) {
-    var letters = '0123456789ABCDEF'.split('');
-    var color = '#';
-    for (var j = 0; j < 6; j += 1) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    result.push(color);
+export const getColor = (n: number) => {
+  const rgb = [0, 0, 0];
+
+  for (let i = 0; i < 24; i++) {
+    rgb[i%3] <<= 1;
+    rgb[i%3] |= n & 0x01;
+    n >>= 1;
   }
-  return result;
+
+  return '#' + rgb.reduce((a, c) => (c > 0x0f ? c.toString(16) : '0' + c.toString(16)) + a, '')
 }
-
-export const colors = getColorArray(100)
-
-export const getColor = (num: number) => colors[num % colors.length]

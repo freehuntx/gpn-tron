@@ -12,6 +12,7 @@ export class Bot {
   #width: number
   #height: number
   #fields: Array<Array<number>>
+  #reconnectTimeout: NodeJS.Timeout
 
   constructor(name: string, ip: string, port: number) {
     this.#name = name
@@ -22,7 +23,6 @@ export class Bot {
   }
 
   connect() {
-    this.disconnect()
     let data = ''
 
     this.#socket = new Socket()
@@ -39,10 +39,13 @@ export class Bot {
     })
 
     this.#socket.on('close', () => {
-      setTimeout(() => this.connect(), 1000)
+      this.disconnect()
     })
 
-    this.#socket.on('error', console.error)
+    this.#socket.on('error', (error) => {
+      console.error(error)
+      this.disconnect()
+    })
 
     this.#socket.connect(this.#port, this.#ip, () => {
       this.#connected = true
@@ -51,9 +54,15 @@ export class Bot {
   }
 
   disconnect() {
+    this.#socket?.removeAllListeners()
     this.#socket?.destroy()
     this.#socket = undefined
     this.#connected = false
+
+    clearTimeout(this.#reconnectTimeout)
+    this.#reconnectTimeout = setTimeout(() => {
+      this.connect()
+    }, 1000)
   }
 
   send(type: string, ...args: any) {
@@ -78,6 +87,7 @@ export class Bot {
     if (type === 'motd') {
     }
     else if (type === 'error') {
+      console.log('error', ...args)
     }
     else if (type === 'game') {
       const [width, height, playerId] = args as number[]
@@ -87,7 +97,7 @@ export class Bot {
       this.#width = width
       this.#height = height
       this.#fields = Array(width).fill(null).map(() => Array(height).fill(-1))
-      this.send('chat', 'Im a stupid bot :(')
+      //this.send('chat', 'Im a stupid bot :(')
     }
     else if (type === 'die') {
       for (let x = 0; x < this.#width; x++) {
