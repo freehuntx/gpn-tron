@@ -20,12 +20,14 @@ export class Game extends EventEmitter {
   #players: Player[]
   #alivePlayerIds: number[]
   #deadPlayerIds: number[]
+  #deadPlayerTicks: number[]
   #width: number
   #height: number
   #fields: Array<Array<number>>
   #state: GameState
   #tickRate = baseTickrate
   #startTime = Date.now()
+  #tick: 0
 
   get alivePlayers(): Player[] {
     return this.#alivePlayerIds.map(e => this.#players[e])
@@ -179,12 +181,14 @@ export class Game extends EventEmitter {
       // If the player was not yet recognized as dead, add it
       if (this.#deadPlayerIds.indexOf(playerIndex) === -1) {
         this.#deadPlayerIds.push(playerIndex)
+        this.#deadPlayerTicks.push(this.#tick)
       }
 
       // If both people entered the field at the same time, kill both
       if (fieldPlayer !== player && fieldPlayer.pos.x === x && fieldPlayer.pos.y === y) {
         if (this.#deadPlayerIds.indexOf(fieldPlayerIndex) === -1) {
           this.#deadPlayerIds.push(fieldPlayerIndex)
+          this.#deadPlayerTicks.push(this.#tick)
         }
       }
     }
@@ -240,9 +244,22 @@ export class Game extends EventEmitter {
       const losers = this.#deadPlayerIds.map(e => this.#players[e])
 
       // Update ELO scores
-      if (winners.length && losers.length) {
+      if (winners.length || losers.length) {
+        // Rank dead players according to their survived ticks
+        const deadPlayerPlaces = [];
+        for (let i = 0; i < losers.length; i++) {
+          if (i == 0 && winners.length) {
+            deadPlayerPlaces.push(1); 
+          } else if (i == 0 && !winners.length) {
+            deadPlayerPlaces.push(2); 
+          } else if (this.#deadPlayerTicks[i] < this.#deadPlayerTicks[i - 1]) {
+            deadPlayerPlaces.push(deadPlayerPlaces[i - 1] + 1);
+          } else {
+            deadPlayerPlaces.push(deadPlayerPlaces[i - 1]); 
+          }
+        }
         const playersInOrder = [...winners, ...losers];
-        const placesInOrder = [...(winners.map(player => 1)), ...(losers.map(player => 2))];
+        const placesInOrder = [...(winners.map(player => 1)), ...deadPlayerPlaces];
         const newEloScores = MultiElo.getNewRatings(playersInOrder.map(player => player.eloScore), placesInOrder);
         for (let i = 0; i < playersInOrder.length; i++) {
           playersInOrder[i].eloScore = newEloScores[i];
@@ -259,5 +276,7 @@ export class Game extends EventEmitter {
 
       setTimeout(() => this.#onTick(), 1000 / this.#tickRate)
     }
+    
+    this.#tick++;
   }
 }
