@@ -40,12 +40,15 @@ export class Game extends EventEmitter {
   constructor(players: Player[]) {
     super()
 
+    // Shuffle the players
+    players = players.sort(() => 0.5 - Math.random())
+
     this.#id = Math.random().toString(32).slice(2)
     this.#players = players
     this.#alivePlayerIds = players.map((e, i) => i)
     this.#deadPlayerIds = []
-    this.#width = players.length * 3
-    this.#height = players.length * 3
+    this.#width = players.length * 2
+    this.#height = players.length * 2
 
     this.#initializeFields()
     this.#initializeGame()
@@ -71,9 +74,10 @@ export class Game extends EventEmitter {
 
   #initializeFields() {
     this.#fields = Array(this.#width).fill(null).map(() => Array(this.#height).fill(-1))
-    const y = this.#height - 2 // 1 distance from lowest wall
-    for (let i = 0; i < this.#players.length; i++) {
-      const x = i * 3 + 1
+
+    for (let i=0; i<this.#players.length; i++) {
+      const x = i*2
+      const y = i*2
       this.#fields[x][y] = i // Set the current player id to the spawn field
       this.#players[i].spawn(x, y)
     }
