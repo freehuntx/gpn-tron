@@ -93,7 +93,6 @@ export default function Home() {
           position: 'absolute',
           top: 0, left: 0,
           width: 'calc(100%/4)', height: 'calc(100%/4)',
-          fontSize: '.8rem',
           overflow: 'hidden'
         }}>
           <h1>GPN Tron</h1>
@@ -114,7 +113,6 @@ export default function Home() {
           position: 'absolute',
           top: 'calc(100%/4)', left: 0,
           width: 'calc(100%/4)', height: 'calc(100% / 2)',
-          fontSize: '.8rem',
           padding: '.5rem',
           overflow: 'hidden'
         }}>
