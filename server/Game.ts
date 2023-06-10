@@ -119,8 +119,19 @@ export class Game extends EventEmitter {
       })
     }
 
+    this.#broadcastPlayerPacket()
     this.#broadcastPos()
     this.broadcastToAlive('tick')
+  }
+
+  #broadcastPlayerPacket() {
+    let playerPacket = ''
+    for (const player of this.alivePlayers) {
+      playerPacket += `player|${player.id}|${player.username}\n`
+    }
+    for (const player of this.alivePlayers) {
+      player.rawSend(playerPacket)
+    }
   }
 
   #broadcastPos() {
@@ -169,6 +180,7 @@ export class Game extends EventEmitter {
       else {
         // Enforce up if player did not move
         action = PlayerAction.MOVE_UP
+        player.sendError('ERROR_NO_MOVE')
       }
 
       player.setPos(x, y)

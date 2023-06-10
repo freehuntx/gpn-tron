@@ -87,6 +87,20 @@ The pos packet is sent by the server to inform the client about a players curren
 
 **Example:** `pos|5|3|8`
 
+### player
+
+The player packet is sent by the server to share informations of an player.
+
+**Name:** player  
+**Sender:** Server  
+**Arguments:**  
+| # | Type | Description |
+|---|--------|--------------------------------------------------------------------|
+| 1 | Number | The player id |
+| 2 | String | The name of the player |
+
+**Example:** `player|3|Coolguy`
+
 ### tick
 
 The tick packet is sent by the server after a turn has been done. Its the best to send a move packet after this!
