@@ -70,7 +70,10 @@ export default function Home() {
       setScoreboard(gameService.scoreboard)
 
       for (const player of gameService.game?.players || []) {
-        if (!player.chat) continue
+        if (!player.chat) {
+          playersLastMessages[player.name] = undefined
+          continue
+        }
         if (playersLastMessages[player.name] === player.chat) continue
         playersLastMessages[player.name] = player.chat
         tmpChatMessages.push({ date: Date.now(), from: player.name, message: player.chat })
@@ -222,9 +225,9 @@ export default function Home() {
           <div style={{
             flexGrow: 1
           }}>
-            {chatMessages.map(({ date, from, message }) => (
+            {[...chatMessages].reverse().map(({ date, from, message }) => (
               <div style={{ margin: '.5rem' }}>
-                <b>{from} ({new Date(date).toUTCString()})</b>
+                <b>{from} ({new Date(date).toISOString().replace(/^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+).*$/, '$3.$2.$1 - $4:$5:$6')})</b>
                 <br />{message}
               </div>
             ))}
