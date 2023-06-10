@@ -96,6 +96,17 @@ export default function Home() {
           overflow: 'hidden'
         }}>
           <h1>GPN Tron</h1>
+          Connect via TCP and join the fun :)
+          <br />
+          You can also watch the current game via the viewer port.
+        </div>
+        {/* ConnectionInfo */}
+        <div style={{
+          position: 'absolute',
+          top: 'calc(100%/4)', left: 0,
+          width: 'calc(100%/4)', height: 'calc(100%/4)',
+          overflow: 'hidden'
+        }}>
           <h3>Ports:</h3>
           <ul>
             <li>- 3000 [HTTP] (View server)</li>
@@ -111,7 +122,7 @@ export default function Home() {
         {/* Scoreboard */}
         <div style={{
           position: 'absolute',
-          top: 'calc(100%/4)', left: 0,
+          top: 'calc(100%/4*2)', left: 0,
           width: 'calc(100%/4)', height: 'calc(100% / 2)',
           padding: '.5rem',
           overflow: 'hidden'
