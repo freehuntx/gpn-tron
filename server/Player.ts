@@ -179,7 +179,7 @@ export class Player extends EventEmitter {
       }
     } else {
       console.log('UNKNOWN PACKET')
-      this.sendError('unknown packet')
+      this.sendError('ERROR_UNKNOWN_PACKET')
     }
   }
 }
