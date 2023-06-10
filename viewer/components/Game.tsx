@@ -21,7 +21,7 @@ export function Game() {
   }, [canvasRef.current])
 
   return (
-    <div style={{ display: 'flex', width: '100%', height: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
       <canvas ref={canvasRef} style={{ margin: 'auto' }}></canvas>
     </div>
   )
