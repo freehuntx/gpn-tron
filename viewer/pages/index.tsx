@@ -8,7 +8,6 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts'
-import { Scoreboard } from '../components/Scoreboard'
 import { Game } from '../components/Game'
 import gameService from '../services/GameService'
 
@@ -49,6 +48,7 @@ export default function Home() {
   const [lastWinners, setLastWinners] = useState<LastWinners>([])
   const [scoreboard, setScoreboard] = useState<Scoreboard>([])
   const [chartData, setChartData] = useState<ChartData>([])
+  const [chatMessages, setChatMessages] = useState<{ date: number; from: string; message: string }[]>([])
   
   const lines: Record<string, any> = {};
   chartData.forEach((point) => {
@@ -62,9 +62,21 @@ export default function Home() {
   });
 
   useEffect(() => {
+    const playersLastMessages = {}
+    let tmpChatMessages: { date: number; from: string; message: string }[] = []
+
     const onUpdate = () => {
       setChartData(gameService.chartData)
       setScoreboard(gameService.scoreboard)
+
+      for (const player of gameService.game?.players || []) {
+        if (!player.chat) continue
+        if (playersLastMessages[player.name] === player.chat) continue
+        playersLastMessages[player.name] = player.chat
+        tmpChatMessages.push({ date: Date.now(), from: player.name, message: player.chat })
+        tmpChatMessages = tmpChatMessages.slice(-30)
+      }
+      setChatMessages(tmpChatMessages)
     }
     gameService.on('update', onUpdate)
 
@@ -99,6 +111,9 @@ export default function Home() {
           Connect via TCP and join the fun :)
           <br />
           You can also watch the current game via the viewer port.
+          <br />
+          <br />
+          <b>Wanna share your bot code? Upload to Github with #gpn-tron</b>
         </div>
         {/* ConnectionInfo */}
         <div style={{
@@ -192,47 +207,30 @@ export default function Home() {
         }}>
           <Game />
         </div>
+        {/* Chart */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'absolute',
+          top: 'calc(100%/4*2)', left: 'calc(100%/4)',
+          width: 'calc(100%/4)', height: 'calc(100% / 4 * 2)',
+          fontSize: '.8rem',
+          padding: '.5rem',
+          overflow: 'hidden'
+        }}>
+          <h2>Chat</h2>
+          <div style={{
+            flexGrow: 1
+          }}>
+            {chatMessages.map(({ date, from, message }) => (
+              <div style={{ margin: '.5rem' }}>
+                <b>{from} ({new Date(date).toUTCString()})</b>
+                <br />{message}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-
-
-      {/*<div style={{ display: 'flex', height: '100%', width: '100%' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, width: '100%' }}>
-          <div style={{ flexGrow: 1, height: '100%' }}>
-            <h1>!!!Development state!!!</h1>
-            <h3>Ports:</h3>
-            <ul>
-              <li>- 3000 [HTTP] (View server)</li>
-              <li>- {serverInfoList[0]?.port || 4000} [TCP] (Game server)</li>
-            </ul>
-            <h3>Hostnames:</h3>
-            <h5>(Please prefer IPv6! As IPv4 may change)</h5>
-            <ul>
-              {serverInfoList.map(({ host, port }) => (
-                <li key={host}>- {host}</li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ flexGrow: 1, height: '100%' }}>
-            <h3 style={{ marginBottom: '.5em' }}>Scoreboard (Last 2 Hours)</h3>
-            {lastWinners.length > 0 && (
-              <>
-                <b>Last winners:</b> {lastWinners.join(', ')}
-                <hr style={{ margin: '1em 0' }} />
-              </>
-            )}
-            <Scoreboard />
-            <h2>
-              Wanna share your bot code? Upload to Github with #gpn-tron
-            </h2>
-          </div>
-        </div>
-        <div style={{ flexGrow: 1, width: '100%' }}>
-          <Game />
-          <h2>
-            Wanna share your bot code? Upload to Github with #gpn-tron
-          </h2>
-        </div>
-        </div>*/}
     </>
   )
 }
