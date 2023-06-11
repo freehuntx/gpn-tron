@@ -52,7 +52,7 @@ The error packet is sent by the server if something went wrong.
 **Arguments:**  
 | # | Type | Description |
 |---|--------|--------------|
-| 1 | String | The error |
+| 1 | String | The error according to [ERRORCODES.md](ERRORCODES.md) |
 
 **Example:** `error|INVALID_USERNAME`
 
