@@ -6,6 +6,7 @@ COPY . /app
 RUN yarn install && yarn cache clean
 
 EXPOSE 3000
+EXPOSE 4001
 EXPOSE 4000
 
 CMD [ "yarn", "dev" ]
