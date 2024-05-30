@@ -28,6 +28,7 @@ export class GameServer {
   constructor(port: number) {
     this.#port = port
     this.#tcpServer = createServer(this.#onSocket.bind(this))
+    this.#tcpServer.on('error', error => console.error(error))
 
     this.#initViewServer()
     this.#loadGameData()
@@ -185,7 +186,7 @@ export class GameServer {
     })
 
     if (maxConnections >= 0 && this.#connectionIpMap[clientSocket.ip] > maxConnections && !clientSocket.ip.endsWith('127.0.0.1')) {
-      console.log(clientSocket.ip)
+      console.log("ERROR_MAX_CONNECTIONS:", clientSocket.ip)
       return clientSocket.sendError('ERROR_MAX_CONNECTIONS', true)
     }
 
