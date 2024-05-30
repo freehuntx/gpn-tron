@@ -1,0 +1,11 @@
+services:
+  gpn-tron-dev:
+    build:
+      context: .
+      dockerfile: dockerfile
+    ports:
+      - "3000:3000"
+      - "4000:4000"
+      - "4001:4001"
+    network_mode: "host"
+    restart: on-failure
