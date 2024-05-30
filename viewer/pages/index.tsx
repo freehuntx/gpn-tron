@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getColor } from '@gpn-tron/shared/constants/colors'
+import { getColorByString } from '@gpn-tron/shared/constants/colors'
 import {
   LineChart,
   Line,
@@ -56,7 +56,7 @@ export default function Home() {
       if (key === "name") return;
       lines[key] = {
         key,
-        stroke: getColor(index)
+        stroke: getColorByString(key)
       };
     });
   });

@@ -1,12 +1,11 @@
-FROM node:18.12.1-alpine
+FROM node:18
 
 WORKDIR /app
-COPY . /app
-
-RUN yarn
+COPY . ./
+RUN yarn install
 
 EXPOSE 3000
 EXPOSE 4001
 EXPOSE 4000
 
-CMD [ "yarn", "dev" ]
+CMD sh -c "yarn dev"

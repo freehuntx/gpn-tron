@@ -1,4 +1,4 @@
-import { getColor } from "@gpn-tron/shared/constants/colors"
+import { getColorByString } from "@gpn-tron/shared/constants/colors"
 import gameService from '../services/GameService'
 
 const wallSize = 1
@@ -89,10 +89,10 @@ export class GameRenderer {
     if (!game) return
     
     for (const player of game.players) {
-      let { id, alive, name, pos: { x, y }, moves, chat } = player
+      let { alive, name, pos: { x, y }, moves } = player
       if (!alive) continue
 
-      const playerColor = getColor(id)
+      const playerColor = getColorByString(name)
       x *= this.factoredRoomSize
       y *= this.factoredRoomSize
       x += this.factoredHalfRoomSize
@@ -187,10 +187,10 @@ export class GameRenderer {
     if (!game) return
 
     for (const player of game.players) {
-      let { id, alive, name, pos: { x, y } } = player
+      let { alive, name, pos: { x, y } } = player
       if (!alive) continue
 
-      const playerColor = getColor(id)
+      const playerColor = getColorByString(name)
       x *= this.factoredRoomSize
       y *= this.factoredRoomSize
       x += this.factoredHalfRoomSize

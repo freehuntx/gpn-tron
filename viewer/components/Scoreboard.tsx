@@ -6,7 +6,7 @@ import {
   YAxis,
   Legend
 } from 'recharts'
-import { getColor } from '@gpn-tron/shared/constants/colors'
+import { getColorByString } from '@gpn-tron/shared/constants/colors'
 import gameService from '../services/GameService'
 
 export function Scoreboard() {
@@ -31,7 +31,7 @@ export function Scoreboard() {
       if (key === "name") return;
       lines[key] = {
         key,
-        stroke: getColor(index)
+        stroke: getColorByString(key)
       };
     });
   });
