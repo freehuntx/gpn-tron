@@ -162,7 +162,7 @@ export default function Home() {
               {scoreboard.map(({ username, winRatio, wins, loses, elo }, index) => (
                 <tr key={username}>
                   <td>{index + 1}.</td>
-                  <td>{username} {lastWinners.indexOf(username) !== -1 && '🎉'}</td>
+                  <td style={{color: getColorByString(username)}}>{username} {lastWinners.indexOf(username) !== -1 && '🎉'}</td>
                   <td>{winRatio.toFixed(2)}</td>
                   <td>{elo.toFixed(0)}</td>
                   <td>{wins}</td>
