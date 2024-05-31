@@ -10,37 +10,7 @@ import {
 } from 'recharts'
 import { Game } from '../components/Game'
 import gameService from '../services/GameService'
-
-// Just a fun component to work around a broken screen on the GPN
-function BrokenScreenFun() {
-  return (
-    <>
-      {/* Broken screen placeholder */}
-      <div
-        style={{
-          zIndex: 999,
-          position: 'absolute',
-          background: 'gray',
-          top: 'calc(100%/4)',
-          left: 'calc(100%/4)',
-          width: 'calc(100%/4)',
-          height: 'calc(100%/4)'
-        }}
-      ></div>
-      <img
-        src="https://i.ibb.co/QJxSCNk/a.jpg"
-        style={{
-          zIndex: 999,
-          position: 'absolute',
-          top: 0,
-          left: 'calc(100%/4)',
-          width: 'calc(100%/4)',
-          height: 'calc(100%/4)'
-        }}
-      />
-    </>
-  )
-}
+import { Schedule } from '../components/Schedule'
 
 export default function Home() {
   const [active, setActive] = useState(false)
@@ -101,7 +71,6 @@ export default function Home() {
   if (!active || !gameService.game) return null
   return (
     <>
-      <BrokenScreenFun />
       <div style={{ height: '100%', width: '100%', position: 'relative' }}>
         {/* Infobox */}
         <div style={{
@@ -210,7 +179,20 @@ export default function Home() {
         }}>
           <Game />
         </div>
-        {/* Chart */}
+        {/* Fahrplan */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'absolute',
+          top: 0, left: 'calc(100%/4)',
+          width: 'calc(100%/4)', height: 'calc(100% / 4 * 2)',
+          fontSize: '.8rem',
+          padding: '.5rem',
+          overflow: 'hidden'
+        }}>
+          <Schedule />
+        </div>
+        {/* Chat */}
         <div style={{
           display: 'flex',
           flexDirection: 'column',
