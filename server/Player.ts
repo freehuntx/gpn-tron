@@ -1,14 +1,14 @@
-import { EventEmitter } from 'events'
-import { escapeString, isStringValid } from '@gpn-tron/shared/utils/string'
-import { ClientSocket } from './ClientSocket'
-import { ScoreHistory, ScoreType } from './Game'
+import { EventEmitter } from "events"
+import { escapeString, isStringValid } from "@gpn-tron/shared/utils/string"
+import { ClientSocket } from "./ClientSocket"
+import { ScoreHistory, ScoreType } from "./Game"
 
-export enum PlayerAction {
+export enum Move {
   NONE,
-  MOVE_UP,
-  MOVE_RIGHT,
-  MOVE_DOWN,
-  MOVE_LEFT
+  UP,
+  RIGHT,
+  DOWN,
+  LEFT
 }
 
 export class Player extends EventEmitter {
@@ -20,7 +20,8 @@ export class Player extends EventEmitter {
   #chatMessage?: string
   #pos = { x: 0, y: 0 }
   #moves: Vec2[] = []
-  #action: PlayerAction = PlayerAction.NONE
+  #move: Move = Move.NONE
+  #lastMove: Move = Move.NONE
   #scoreHistory: ScoreHistory = []
   #eloScore = 1000
   #state: PlayerState
@@ -49,7 +50,6 @@ export class Player extends EventEmitter {
   get eloScore(): number { return this.#eloScore }
   set eloScore(eloScore: number) { this.#eloScore = eloScore }
   get state() { return this.#state }
-  get action(): PlayerAction { return this.#action }
 
   // Returns the time filtered scores. Everything above 2 hours is removed.
   get scoreHistory(): ScoreHistory {
@@ -126,6 +126,24 @@ export class Player extends EventEmitter {
     this.#socket?.rawSend(packet)
   }
 
+  readMove(): Move {
+    let move = Move.UP // Default move
+
+    if (this.#move === Move.NONE) {
+      this.sendError('ERROR_NO_MOVE')
+
+      if (this.#lastMove !== Move.NONE) {
+        move = this.#lastMove
+      }
+    } else {
+      this.#lastMove = this.#move
+      move = this.#move
+      this.#move = Move.NONE
+    }
+
+    return move
+  }
+
   win() {
     this.#scoreHistory.push({ type: ScoreType.WIN, time: Date.now() })
     this.send('win', this.wins, this.loses)
@@ -150,10 +168,10 @@ export class Player extends EventEmitter {
   #onPacket(packetType: string, ...args: any) {
     if (packetType === 'move') {
       const [direction] = args
-      if (direction === 'up') this.#action = PlayerAction.MOVE_UP
-      else if (direction === 'right') this.#action = PlayerAction.MOVE_RIGHT
-      else if (direction === 'down') this.#action = PlayerAction.MOVE_DOWN
-      else if (direction === 'left') this.#action = PlayerAction.MOVE_LEFT
+      if (direction === 'up') this.#move = Move.UP
+      else if (direction === 'right') this.#move = Move.RIGHT
+      else if (direction === 'down') this.#move = Move.DOWN
+      else if (direction === 'left') this.#move = Move.LEFT
       else this.sendError('WARNING_UNKNOWN_MOVE')
     }
     else if (packetType === 'chat') {

@@ -1,5 +1,5 @@
 import { GameServer } from "./GameServer"
-import { Bot } from './Bot'
+import { Bot } from "./Bot"
 
 const GAME_PORT = parseInt(process.env.GAME_PORT || '') || 4000
 

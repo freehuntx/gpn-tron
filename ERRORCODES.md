@@ -10,7 +10,7 @@ You are spamming the server.
 You are sending more than 1024 bytes to the server.
 
 ## ERROR_NO_MOVE
-You didnt send a move packet.
+You didnt send a move packet. Note: This takes either your last move or UP (default).
 
 ## ERROR_MAX_CONNECTIONS
 Your ip is already connected. IPv6 may workarounds this but please dont flood the server with connections :(

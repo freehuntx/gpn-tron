@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { getColorByString } from '@gpn-tron/shared/constants/colors'
+import { useEffect, useState } from "react"
+import { getColorByString } from "@gpn-tron/shared/constants/colors"
 import {
   LineChart,
   Line,
@@ -7,10 +7,10 @@ import {
   YAxis,
   Legend,
   ResponsiveContainer
-} from 'recharts'
-import { Game } from '../components/Game'
-import gameService from '../services/GameService'
-import { Schedule } from '../components/Schedule'
+} from "recharts"
+import { Game } from "../components/Game"
+import gameService from "../services/GameService"
+import { Schedule } from "../components/Schedule"
 
 export default function Home() {
   const [active, setActive] = useState(false)

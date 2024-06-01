@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { useOnMount } from '../hooks/onMount';
+import { useEffect, useState } from "react"
+import { useOnMount } from "../hooks/onMount";
 
 export function Schedule() {
   const [talks, setTalks] = useState<{ title: string; start: Date; end: Date }[]>([])

@@ -1,6 +1,6 @@
-import { createServer, Server } from 'http'
-import { Server as IoServer } from 'socket.io'
-import { generate, observe } from 'fast-json-patch'
+import { createServer, Server } from "http"
+import { Server as IoServer } from "socket.io"
+import { generate, observe } from "fast-json-patch"
 
 const EXTERNAL_REACHABLE = true
 

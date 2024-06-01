@@ -1,6 +1,6 @@
-import { EventEmitter } from 'events'
-import { io, Socket } from 'socket.io-client'
-import { applyPatch } from 'fast-json-patch'
+import { EventEmitter } from "events"
+import { io, Socket } from "socket.io-client"
+import { applyPatch } from "fast-json-patch"
 
 export class WsStateClient<WsStateType> extends EventEmitter {
   #socket: Socket

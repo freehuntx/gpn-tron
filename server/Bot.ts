@@ -1,4 +1,4 @@
-import { Socket } from 'net'
+import { Socket } from "net"
 
 export class Bot {
   #socket: Socket
@@ -7,7 +7,6 @@ export class Bot {
   #connected = false
   #name: string
   #pos: Vec2 = { x: 0, y: 0 }
-  #ingame = false
   #playerId: number
   #width: number
   #height: number
@@ -81,9 +80,7 @@ export class Bot {
 
     const args = packet.split('|').map(arg => /^\-?\d+(\.\d+)?$/.test(arg) ? Number(arg) : arg)
     const type = args.shift()
-    //console.log(type, ...args)
 
-    // Do
     if (type === 'motd') {
     }
     else if (type === 'error') {
@@ -91,13 +88,11 @@ export class Bot {
     }
     else if (type === 'game') {
       const [width, height, playerId] = args as number[]
-      this.#ingame = true
       this.#playerId = playerId
       this.#pos = { x: 0, y: 0 }
       this.#width = width
       this.#height = height
       this.#fields = Array(width).fill(null).map(() => Array(height).fill(-1))
-      //this.send('chat', 'Im a stupid bot :(')
     }
     else if (type === 'die') {
       for (let x = 0; x < this.#width; x++) {
@@ -110,7 +105,6 @@ export class Bot {
       }
     }
     else if (type === 'lose' || type === 'win') {
-      this.#ingame = false
       this.#playerId = undefined
     }
     else if (type === 'pos') {

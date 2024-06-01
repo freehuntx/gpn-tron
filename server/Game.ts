@@ -1,7 +1,7 @@
-import { EventEmitter } from 'events'
-import { MultiElo } from 'multi-elo'
-import { baseTickrate, tickIncreaseInterval } from '@gpn-tron/shared/constants/common'
-import { Player, PlayerAction } from "./Player"
+import { EventEmitter } from "events"
+import { MultiElo } from "multi-elo"
+import { baseTickrate, tickIncreaseInterval } from "@gpn-tron/shared/constants/common"
+import { Player, Move } from "./Player"
 
 export enum ScoreType {
   LOOSE,
@@ -157,29 +157,24 @@ export class Game extends EventEmitter {
 
     // Update player position
     for (const player of this.alivePlayers) {
-      let { action } = player
+      const move = player.readMove()
       let { x, y } = player.pos
 
-      if (action === PlayerAction.MOVE_UP) {
+      if (move === Move.UP) {
         if (y === 0) y = this.#height - 1
         else y--
       }
-      else if (action === PlayerAction.MOVE_RIGHT) {
+      else if (move === Move.RIGHT) {
         if (x === this.#width - 1) x = 0
         else x++
       }
-      else if (action === PlayerAction.MOVE_DOWN) {
+      else if (move === Move.DOWN) {
         if (y === this.#height - 1) y = 0
         else y++
       }
-      else if (action === PlayerAction.MOVE_LEFT) {
+      else if (move === Move.LEFT) {
         if (x === 0) x = this.#width - 1
         else x--
-      }
-      else {
-        // Enforce up if player did not move
-        action = PlayerAction.MOVE_UP
-        player.sendError('ERROR_NO_MOVE')
       }
 
       player.setPos(x, y)

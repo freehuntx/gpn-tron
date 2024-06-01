@@ -1,6 +1,6 @@
-import { Socket } from 'net'
-import { EventEmitter } from 'events'
-//import { maxPacketsPerSecond } from '@gpn-tron/shared/constants/common'
+import { Socket } from "net"
+import { EventEmitter } from "events"
+//import { maxPacketsPerSecond } from "@gpn-tron/shared/constants/common"
 
 export class ClientSocket extends EventEmitter {
   #connected = false

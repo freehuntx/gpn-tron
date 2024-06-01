@@ -1,12 +1,12 @@
-import { networkInterfaces, tmpdir } from 'os'
-import { existsSync, readFileSync, writeFileSync } from 'fs'
-import { createServer, Server, Socket } from 'net'
-import { joinTimeout, maxConnections } from '@gpn-tron/shared/constants/common'
-import { isStringValid } from '@gpn-tron/shared/utils/string'
-import { WsStateServer } from '@gpn-tron/shared/lib/ws-state/server'
-import { ClientSocket } from './ClientSocket'
-import { Player } from './Player'
-import { Game, ScoreType } from './Game'
+import { networkInterfaces, tmpdir } from "os"
+import { existsSync, readFileSync, writeFileSync } from "fs"
+import { createServer, Server, Socket } from "net"
+import { joinTimeout, maxConnections } from "@gpn-tron/shared/constants/common"
+import { isStringValid } from "@gpn-tron/shared/utils/string"
+import { WsStateServer } from "@gpn-tron/shared/lib/ws-state/server"
+import { ClientSocket } from "./ClientSocket"
+import { Player } from "./Player"
+import { Game, ScoreType } from "./Game"
 
 const VIEW_PORT = parseInt(process.env.VIEW_PORT || '') || 4001
 const GAME_DATA_PATH = `${tmpdir()}/gpn-tron-data.json`

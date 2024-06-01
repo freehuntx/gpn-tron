@@ -1,5 +1,5 @@
 import { getColorByString } from "@gpn-tron/shared/constants/colors"
-import gameService from '../services/GameService'
+import gameService from "../services/GameService"
 
 const wallSize = 1
 const floorSize = 16
