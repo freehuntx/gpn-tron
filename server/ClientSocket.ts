@@ -6,6 +6,8 @@ export class ClientSocket extends EventEmitter {
   #connected = false
   #ip: string
   #socket?: Socket
+  #sendBuffer = ""
+  #sendTimeout?: NodeJS.Timeout
 
   /**
    * Create a ClientSocket instance from a tcp socket instance
@@ -85,13 +87,20 @@ export class ClientSocket extends EventEmitter {
 
   rawSend(packet: string) {
     if (!this.connected || !this.#socket || this.#socket.destroyed) return
-    try {
-      this.#socket.write(packet)
-    }
-    catch (error) {
-      console.error(error)
-      this.disconnect()
-    }
+
+    this.#sendBuffer += packet
+
+    clearTimeout(this.#sendTimeout)
+    this.#sendTimeout = setTimeout(() => {
+      try {
+        this.#socket.write(this.#sendBuffer)
+        this.#sendBuffer = ""
+      }
+      catch (error) {
+        console.error(error)
+        this.disconnect()
+      }
+    }, 1)
   }
 
   sendError(error: string, disconnect = false) {
