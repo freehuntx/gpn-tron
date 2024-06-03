@@ -7,11 +7,11 @@ The challenge: Create a bot that beats the other players!
 
 ## Prequisites
 - [NodeJS](https://nodejs.org/en)  
-  `apt get install nodejs npm` 
+  `apt-get install nodejs npm` 
 - [NPM](https://docs.npmjs.com)  
   `see command above` 
 - [Yarn](https://docs.npmjs.com)  
-  `apt get install yarn` 
+  `apt-get install yarn` 
 - An decent browser (For opening the viewer page)
 
 ## Installation
