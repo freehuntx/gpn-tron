@@ -212,7 +212,7 @@ export class GameServer {
       // Check the password
       if (typeof password !== "string") return clientSocket.sendError('ERROR_INVALID_PASSWORD', true)
       if (password.length < 1) return clientSocket.sendError('ERROR_PASSWORD_TOO_SHORT', true)
-      if (username.length > 128) return clientSocket.sendError('ERROR_PASSWORD_TOO_LONG', true)
+      if (password.length > 128) return clientSocket.sendError('ERROR_PASSWORD_TOO_LONG', true)
 
       // Check for bots
       if (/^bot\d*$/.test(username)) {
